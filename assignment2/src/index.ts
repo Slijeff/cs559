@@ -5,9 +5,8 @@ const xmid = canvas.width / 2;
 const ymid = canvas.height / 2;
 const PI = Math.PI;
 let isDragging = false;
-let isHolding = false;
-let relx = 0;
-let rely = 0;
+let relx = xmid;
+let rely = ymid;
 let moveByDeg = 1;
 let speed = 0.4;
 let acc = 0.02;
@@ -98,14 +97,16 @@ const update = () => {
   ctx.save();
   ctx.save();
   drawFan();
-};
+  relx = 0;
+  rely = 0;
 
-const animateSlowDown = () => {
-  speed *= 1 - acc;
-  update();
-  if (speed > 0.4 && !isDragging) {
-    requestAnimationFrame(animateSlowDown);
+  if (speed > 0.4) {
+    moveByDeg = -1;
+
+    speed *= 1 - acc;
   }
+
+  requestAnimationFrame(update);
 };
 
 const main = () => {
@@ -117,8 +118,6 @@ const main = () => {
     let loc = getCursorPositionRelative(canvas, ctx, e);
     relx = loc.x;
     rely = loc.y;
-    moveByDeg = -1;
-    animateSlowDown();
   };
   canvas.onmousemove = (e: MouseEvent) => {
     if (isDragging) {
@@ -126,13 +125,14 @@ const main = () => {
       let loc = getCursorPositionRelative(canvas, ctx, e);
       relx = loc.x;
       rely = loc.y;
-      speed *= 1 + acc;
-      update();
+      speed *= 1 + acc + 0.03;
     }
   };
   // original
   ctx.translate(xmid, ymid);
   ctx.save();
   drawFan();
+
+  update();
 };
 main();
