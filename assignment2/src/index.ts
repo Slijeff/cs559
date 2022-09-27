@@ -103,7 +103,7 @@ const update = () => {
 const animateSlowDown = () => {
   speed *= 1 - acc;
   update();
-  if (speed > 0.4 && (!isDragging || isHolding)) {
+  if (speed > 0.4 && !isDragging) {
     requestAnimationFrame(animateSlowDown);
   }
 };
@@ -111,13 +111,9 @@ const animateSlowDown = () => {
 const main = () => {
   canvas.onmousedown = (e: MouseEvent) => {
     isDragging = true;
-    isHolding = true;
-    animateSlowDown();
   };
   canvas.onmouseup = (e: MouseEvent) => {
     isDragging = false;
-    isHolding = false;
-    // speed = 0.4;
     let loc = getCursorPositionRelative(canvas, ctx, e);
     relx = loc.x;
     rely = loc.y;
@@ -125,8 +121,7 @@ const main = () => {
     animateSlowDown();
   };
   canvas.onmousemove = (e: MouseEvent) => {
-    isHolding = false;
-    if (isDragging || isHolding) {
+    if (isDragging) {
       moveByDeg = 1;
       let loc = getCursorPositionRelative(canvas, ctx, e);
       relx = loc.x;
