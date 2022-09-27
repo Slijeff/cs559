@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A simple drawing demo</title>
+  </head>
+  <body>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 100px 200px;
+        height: 80vh;
+      "
+    >
+      <canvas
+        id="myCanvas"
+        width="1200"
+        height="700"
+        style="border: 1px solid grey; border-radius: 10px"
+      >
+      </canvas>
+      <input id="slider" type="range" min="0" max="5" />
+    </div>
+    <script src="index.js" id="module"></script>
+  </body>
+</html>

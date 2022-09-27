@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "allowUnreachableCode": false,
+        "alwaysStrict": true
+    },
+    "files": ["demo.ts"]
+}

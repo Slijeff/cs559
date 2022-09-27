@@ -1,0 +1,49 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "esbuild watch",
+            "type": "shell",
+            "command": "esbuild .\\index.ts --bundle --watch --outfile=../index.js --analyze",
+            "options": {
+                "cwd": "${workspaceFolder}/${input:assignment}/src"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "esbuild watch minify",
+            "type": "shell",
+            "command": "esbuild .\\index.ts --bundle --watch --outfile=../index.js --sourcemap --minify",
+            "options": {
+                "cwd": "${workspaceFolder}/${input:assignment}/src"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "esbuild build verbose",
+            "type": "shell",
+            "command": "esbuild .\\index.ts --bundle --outfile=../index.js --analyze=verbose",
+            "options": {
+                "cwd": "${workspaceFolder}/${input:assignment}/src"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "esbuild build minify verbose",
+            "type": "shell",
+            "command": "esbuild .\\index.ts --bundle --outfile=../index.js --sourcemap --minify --analyze=verbose",
+            "options": {
+                "cwd": "${workspaceFolder}/${input:assignment}/src"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [{
+        "id": "assignment",
+        "description": "the subfolder that contains the source",
+        "default": "assignment2",
+        "type": "promptString"
+    }]
+}
