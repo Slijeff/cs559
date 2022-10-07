@@ -75,6 +75,7 @@ export class Snake {
         vec2.transformMat3(center, [0, 0], this.trans_mat);
         this.ctx.fillStyle = "#d28aff";
         this.drawBlock("#d28aff");
+        this.drawEyes("#000000");
 
         // this.ctx.fillStyle = "#0b1628";
         // vec2.transformMat3(center, [0, 3], this.trans_mat);
@@ -163,6 +164,33 @@ export class Snake {
         this.ctx.closePath();
         this.ctx.fillStyle = color;
         this.ctx.fill();
+    }
+
+    private drawEyes(color: string) {
+        let eyes_trans = mat3.clone(this.trans_mat);
+        const eye_size = 10;
+        mat3.fromTranslation(eyes_trans, [-3, -1]);
+        let eyes_to_body = mat3.create();
+        mat3.multiply(eyes_to_body, this.trans_mat, eyes_trans);
+        this.ctx.beginPath();
+        this.moveToTx(0, 0, eyes_to_body);
+        this.lineToTx(0, eye_size, eyes_to_body);
+        this.lineToTx(eye_size, eye_size, eyes_to_body);
+        this.lineToTx(eye_size, 0, eyes_to_body);
+        this.ctx.closePath();
+        this.ctx.fillStyle = color;
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.moveToTx(eye_size + 6, 0, eyes_to_body);
+        this.lineToTx(eye_size + 6, eye_size, eyes_to_body);
+        this.lineToTx(eye_size * 2 + 6, eye_size, eyes_to_body);
+        this.lineToTx(eye_size * 2 + 6, 0, eyes_to_body);
+        this.ctx.closePath();
+        this.ctx.fillStyle = color;
+        this.ctx.fill();
+
+
     }
 
 }
