@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Assignment 2</title>
+  </head>
+  <body>
+    <style>
+      .heading {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: larger;
+        margin: 1rem;
+      }
+      .text {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: medium;
+        margin: 0.25rem;
+      }
+    </style>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 100px 200px;
+        height: 80vh;
+      "
+    >
+      <p class="heading">Assignment 3</p>
+      <p class="text"> Press w,a,s,d or arrow keys to get started </p>
+      <canvas
+        id="myCanvas"
+        width="1200"
+        height="700"
+        style="border: 1px solid grey; "
+      >
+      </canvas>
+      <div style="display: flex; flex-direction: row;">
+        <button id="start" style="margin: 10px">Start</button>
+        <button id="pause" style="margin: 10px">Pause</button>
+        <button id="restart" style="margin: 10px">Restart</button>
+      </div>
+
+    </div>
+    <script src="index.js" id="module"></script>
+  </body>
+</html>
