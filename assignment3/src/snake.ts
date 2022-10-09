@@ -1,4 +1,5 @@
 import {mat3, vec2} from "./esm/index";
+import {Target} from "./target";
 
 type tail = mat3;
 
@@ -22,6 +23,15 @@ export class Snake {
         this.original_mat = transformation;
         this.speed_x = 0;
         this.speed_y = 0;
+        this.targetCount = 0;
+    }
+
+    public get x(): number {
+        return this.trans_mat[6];
+    }
+
+    public get y(): number {
+        return this.trans_mat[7];
     }
 
     moveToTx(x, y, Tx) {
@@ -73,15 +83,9 @@ export class Snake {
         })
         let center = vec2.create();
         vec2.transformMat3(center, [0, 0], this.trans_mat);
-        this.ctx.fillStyle = "#d28aff";
         this.drawBlock("#d28aff");
-        this.drawEyes("#000000");
+        // this.drawEyes("#000000");
 
-        // this.ctx.fillStyle = "#0b1628";
-        // vec2.transformMat3(center, [0, 3], this.trans_mat);
-        // this.ctx.fillRect(center[0], center[1], 6, 6);
-        // vec2.transformMat3(center, [this.size - 6, 3], this.trans_mat);
-        // this.ctx.fillRect(center[0], center[1], 6, 6);
         this.axes('red', this.trans_mat);
 
         return this;
@@ -92,12 +96,12 @@ export class Snake {
             this.tails[i] = mat3.clone(this.tails[i + 1]);
         }
         if (this.targetCount > 0) {
-            this.tails[this.targetCount - 1 + this.tails.length] = mat3.clone(this.trans_mat);
+            this.tails[this.targetCount - 1] = mat3.clone(this.trans_mat);
         }
 
         mat3.translate(this.trans_mat, this.trans_mat, [this.speed_x, this.speed_y]);
-        mat3.rotate(this.trans_mat, this.trans_mat, this.rotation);
-        this.rotation = 0;
+        // mat3.rotate(this.trans_mat, this.trans_mat, this.rotation);
+        // this.rotation = 0;
 
         if (this.trans_mat[7] < 0) {
             this.trans_mat[7] = this.canvas.height
@@ -153,6 +157,22 @@ export class Snake {
                 break;
         }
         return this;
+    }
+
+    public eatTarget(target: Target): Snake {
+        // console.log(this.x, this.y, target.x, target.y);
+        if (this.checkTargetCollision(this.x, this.y, target.x, target.y)) {
+            this.targetCount++;
+            target.getRandomLocation();
+            console.log(this.targetCount, target.x, target.y);
+
+        }
+        return this;
+    }
+
+    private checkTargetCollision(x1: number, y1: number, x2: number, y2: number): boolean {
+        return (x2 - this.size <= x1 && x1 <= x2 + this.size) &&
+            (y2 - this.size <= y1 && y1 <= y2 + this.size);
     }
 
     private drawBlock(color: string) {

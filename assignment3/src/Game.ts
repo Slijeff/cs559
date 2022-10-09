@@ -9,8 +9,8 @@ export class Game {
     readonly canvas: HTMLCanvasElement;
     readonly ctx: CanvasRenderingContext2D;
     readonly start_point: vec2;
-    readonly decay: number = 0.08;
-    readonly min_tick: number = 20;
+    readonly decay: number = 0.06;
+    readonly min_tick: number = 30;
     private tick: number = 100;
     private target: Target;
     private snake: Snake;
@@ -35,6 +35,9 @@ export class Game {
         let snakeTransformMat = mat3.create();
         mat3.fromTranslation(snakeTransformMat, this.start_point);
         this.snake = new Snake(this.size, this.canvas, this.ctx, mat3.clone(snakeTransformMat))
+            .render();
+
+        this.target = new Target(this.n_rows, this.n_cols, this.size, this.canvas, this.ctx)
             .render();
 
         window.addEventListener('keydown', (ev: KeyboardEvent) => {
@@ -65,6 +68,7 @@ export class Game {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.snake = new Snake(this.size, this.canvas, this.ctx, mat3.clone(snakeTransformMat))
                 .render();
+            this.target.render();
             this.started = false;
             this.tick = 100;
         }
@@ -72,16 +76,15 @@ export class Game {
     }
 
     public start(): void {
+        let id: number;
         if (this.started) {
-            setTimeout(() => {
+            id = setTimeout(() => {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.snake.update().render();
+                this.snake.update().render().eatTarget(this.target);
+                this.target.render();
                 this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
                 this.start();
             }, this.tick);
         }
-
-        // requestAnimationFrame(this.start(self));
-
     }
 }
