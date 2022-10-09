@@ -25,7 +25,8 @@ export class Game {
         this.n_cols = canvas.width / size;
         this.started = false;
         // Initial point of the snake
-        this.start_point = [this.canvas.width / 2, this.canvas.height / 2]
+        this.start_point = [((this.canvas.width / this.n_cols)) * Math.floor(this.n_cols / 2),
+            ((this.canvas.height / this.n_rows)) * Math.floor(this.n_rows / 2)]
     }
 
     public init(): void {
@@ -86,5 +87,9 @@ export class Game {
                 this.start();
             }, this.tick);
         }
+    }
+
+    private renderGrid(): void {
+
     }
 }

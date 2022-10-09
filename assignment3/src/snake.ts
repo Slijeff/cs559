@@ -30,8 +30,16 @@ export class Snake {
         return this.trans_mat[6];
     }
 
+    public set x(n) {
+        this.trans_mat[6] = n;
+    }
+
     public get y(): number {
         return this.trans_mat[7];
+    }
+
+    public set y(n) {
+        this.trans_mat[7] = n;
     }
 
     moveToTx(x, y, Tx) {
@@ -103,17 +111,19 @@ export class Snake {
         // mat3.rotate(this.trans_mat, this.trans_mat, this.rotation);
         // this.rotation = 0;
 
-        if (this.trans_mat[7] < 0) {
-            this.trans_mat[7] = this.canvas.height
+        console.log("snake current loc: ", this.x, this.y);
+
+        if (this.y < 0) {
+            this.y = this.canvas.height - this.size;
         }
-        if (this.trans_mat[7] > this.canvas.height) {
-            this.trans_mat[7] = 0
+        if (this.y >= this.canvas.height) {
+            this.y = 0
         }
-        if (this.trans_mat[6] < 0) {
-            this.trans_mat[6] = this.canvas.width
+        if (this.x < 0) {
+            this.x = this.canvas.width - this.size;
         }
-        if (this.trans_mat[6] > this.canvas.width) {
-            this.trans_mat[6] = 0
+        if (this.x >= this.canvas.width) {
+            this.x = 0
         }
 
         return this;
