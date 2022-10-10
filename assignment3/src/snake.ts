@@ -15,6 +15,7 @@ export class Snake extends Data {
     private speed_x: number;
     private speed_y: number;
     private rotation: number = 0;
+    private html_score: HTMLParagraphElement;
 
     constructor(size: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, transformation: mat3) {
         super();
@@ -25,7 +26,10 @@ export class Snake extends Data {
         this.original_mat = transformation;
         this.speed_x = 0;
         this.speed_y = 0;
-        this.targetCount = 2;
+        this.targetCount = 0;
+        this.html_score = document.querySelector('#score') as HTMLParagraphElement;
+        this.html_score.innerText = "SCORE: 0";
+
     }
 
     public get x(): number {
@@ -56,7 +60,7 @@ export class Snake extends Data {
         this.drawBlock("#d28aff");
         // this.drawEyes("#000000");
 
-        this.axes('red', this.trans_mat);
+        // this.axes('red', this.trans_mat);
 
         return this;
     }
@@ -135,6 +139,7 @@ export class Snake extends Data {
         if (this.x == target.x && this.y == target.y) {
             this.targetCount++;
             target.getRandomLocation(this.getAllTailsLocations());
+            this.html_score.innerText = `SCORE: ${this.targetCount}`;
         }
         return this;
     }
