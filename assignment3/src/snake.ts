@@ -1,9 +1,10 @@
 import {mat3, vec2} from "./esm/index";
 import {Target} from "./target";
+import {Data} from "./data";
 
 type tail = mat3;
 
-export class Snake {
+export class Snake extends Data {
     readonly size: number;
     readonly canvas: HTMLCanvasElement;
     readonly ctx: CanvasRenderingContext2D;
@@ -16,6 +17,7 @@ export class Snake {
     private rotation: number = 0;
 
     constructor(size: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, transformation: mat3) {
+        super();
         this.size = size;
         this.canvas = canvas;
         this.ctx = context;
@@ -23,7 +25,7 @@ export class Snake {
         this.original_mat = transformation;
         this.speed_x = 0;
         this.speed_y = 0;
-        this.targetCount = 0;
+        this.targetCount = 2;
     }
 
     public get x(): number {
@@ -40,46 +42,6 @@ export class Snake {
 
     public set y(n) {
         this.trans_mat[7] = n;
-    }
-
-    moveToTx(x, y, Tx) {
-        let res = vec2.create();
-        vec2.transformMat3(res, [x, y], Tx);
-        this.ctx.moveTo(res[0], res[1]);
-    }
-
-    lineToTx(x, y, Tx) {
-        let res = vec2.create();
-        vec2.transformMat3(res, [x, y], Tx);
-        this.ctx.lineTo(res[0], res[1]);
-    }
-
-    axes(color, Tx) {
-        this.ctx.strokeStyle = color;
-        this.ctx.beginPath();
-        // Axes
-        this.moveToTx(120, 0, Tx);
-        this.lineToTx(0, 0, Tx);
-        this.lineToTx(0, 120, Tx);
-        // Arrowheads
-        this.moveToTx(110, 5, Tx);
-        this.lineToTx(120, 0, Tx);
-        this.lineToTx(110, -5, Tx);
-        this.moveToTx(5, 110, Tx);
-        this.lineToTx(0, 120, Tx);
-        this.lineToTx(-5, 110, Tx);
-        // X-label
-        this.moveToTx(130, -5, Tx);
-        this.lineToTx(140, 5, Tx);
-        this.moveToTx(130, 5, Tx);
-        this.lineToTx(140, -5, Tx);
-        // Y-label
-        this.moveToTx(-5, 130, Tx);
-        this.lineToTx(0, 135, Tx);
-        this.lineToTx(5, 130, Tx);
-        this.moveToTx(0, 135, Tx);
-        this.lineToTx(0, 142, Tx);
-        this.ctx.stroke();
     }
 
     public render(): Snake {
@@ -111,7 +73,7 @@ export class Snake {
         // mat3.rotate(this.trans_mat, this.trans_mat, this.rotation);
         // this.rotation = 0;
 
-        console.log("snake current loc: ", this.x, this.y);
+        // console.log("snake current loc: ", this.x, this.y);
 
         if (this.y < 0) {
             this.y = this.canvas.height - this.size;
@@ -170,19 +132,63 @@ export class Snake {
     }
 
     public eatTarget(target: Target): Snake {
-        // console.log(this.x, this.y, target.x, target.y);
-        if (this.checkTargetCollision(this.x, this.y, target.x, target.y)) {
+        if (this.x == target.x && this.y == target.y) {
             this.targetCount++;
-            target.getRandomLocation();
-            console.log(this.targetCount, target.x, target.y);
-
+            target.getRandomLocation(this.getAllTailsLocations());
         }
         return this;
     }
 
+    public getAllTailsLocations(): Set<string> {
+        let locations = new Set<string>();
+        this.tails.forEach((tail) => {
+            locations.add(JSON.stringify([tail[6], tail[7]]));
+        })
+        return locations;
+    }
+
+    private moveToTx(x, y, Tx) {
+        let res = vec2.create();
+        vec2.transformMat3(res, [x, y], Tx);
+        this.ctx.moveTo(res[0], res[1]);
+    }
+
+    private lineToTx(x, y, Tx) {
+        let res = vec2.create();
+        vec2.transformMat3(res, [x, y], Tx);
+        this.ctx.lineTo(res[0], res[1]);
+    }
+
+    private axes(color, Tx) {
+        this.ctx.strokeStyle = color;
+        this.ctx.beginPath();
+        // Axes
+        this.moveToTx(120, 0, Tx);
+        this.lineToTx(0, 0, Tx);
+        this.lineToTx(0, 120, Tx);
+        // Arrowheads
+        this.moveToTx(110, 5, Tx);
+        this.lineToTx(120, 0, Tx);
+        this.lineToTx(110, -5, Tx);
+        this.moveToTx(5, 110, Tx);
+        this.lineToTx(0, 120, Tx);
+        this.lineToTx(-5, 110, Tx);
+        // X-label
+        this.moveToTx(130, -5, Tx);
+        this.lineToTx(140, 5, Tx);
+        this.moveToTx(130, 5, Tx);
+        this.lineToTx(140, -5, Tx);
+        // Y-label
+        this.moveToTx(-5, 130, Tx);
+        this.lineToTx(0, 135, Tx);
+        this.lineToTx(5, 130, Tx);
+        this.moveToTx(0, 135, Tx);
+        this.lineToTx(0, 142, Tx);
+        this.ctx.stroke();
+    }
+
     private checkTargetCollision(x1: number, y1: number, x2: number, y2: number): boolean {
-        return (x2 - this.size <= x1 && x1 <= x2 + this.size) &&
-            (y2 - this.size <= y1 && y1 <= y2 + this.size);
+        return x1 == x2 && y1 == y2;
     }
 
     private drawBlock(color: string) {

@@ -33,9 +33,14 @@ export class Target {
         return Math.random() * (max - min) + min;
     }
 
-    public getRandomLocation(): Target {
+    public getRandomLocation(tabooLocations: Set<string>): Target {
         let x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
         let y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
+        while (tabooLocations.has(JSON.stringify([x, y]))) {
+            console.log([x, y]);
+            x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
+            y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
+        }
         this.trans_mat = mat3.create();
         mat3.fromTranslation(this.trans_mat, [x, y]);
         return this

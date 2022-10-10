@@ -9,8 +9,8 @@ export class Game {
     readonly canvas: HTMLCanvasElement;
     readonly ctx: CanvasRenderingContext2D;
     readonly start_point: vec2;
-    readonly decay: number = 0.06;
-    readonly min_tick: number = 30;
+    readonly decay: number = 0.05;
+    readonly min_tick: number = 50;
     private tick: number = 100;
     private target: Target;
     private snake: Snake;
@@ -42,6 +42,7 @@ export class Game {
             .render();
 
         window.addEventListener('keydown', (ev: KeyboardEvent) => {
+            ev.preventDefault();
             const dir = ev.key;
             this.snake.changeDirection(dir);
             if (!this.started) {
