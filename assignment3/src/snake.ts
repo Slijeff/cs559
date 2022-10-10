@@ -58,9 +58,6 @@ export class Snake extends Data {
         let center = vec2.create();
         vec2.transformMat3(center, [0, 0], this.trans_mat);
         this.drawBlock("#d28aff");
-        // this.drawEyes("#000000");
-
-        // this.axes('red', this.trans_mat);
 
         return this;
     }
@@ -74,10 +71,6 @@ export class Snake extends Data {
         }
 
         mat3.translate(this.trans_mat, this.trans_mat, [this.speed_x, this.speed_y]);
-        // mat3.rotate(this.trans_mat, this.trans_mat, this.rotation);
-        // this.rotation = 0;
-
-        // console.log("snake current loc: ", this.x, this.y);
 
         if (this.y < 0) {
             this.y = this.canvas.height - this.size;
@@ -152,6 +145,15 @@ export class Snake extends Data {
         return locations;
     }
 
+    public checkTailsCollision(): Snake {
+        if (this.getAllTailsLocations().has(JSON.stringify([this.x, this.y]))) {
+            this.targetCount = 0;
+            this.tails = [];
+            this.html_score.innerText = "SCORE: 0";
+        }
+        return
+    }
+
     private moveToTx(x, y, Tx) {
         let res = vec2.create();
         vec2.transformMat3(res, [x, y], Tx);
@@ -190,10 +192,6 @@ export class Snake extends Data {
         this.moveToTx(0, 135, Tx);
         this.lineToTx(0, 142, Tx);
         this.ctx.stroke();
-    }
-
-    private checkTargetCollision(x1: number, y1: number, x2: number, y2: number): boolean {
-        return x1 == x2 && y1 == y2;
     }
 
     private drawBlock(color: string) {

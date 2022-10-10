@@ -1159,6 +1159,14 @@
       });
       return locations;
     }
+    checkTailsCollision() {
+      if (this.getAllTailsLocations().has(JSON.stringify([this.x, this.y]))) {
+        this.targetCount = 0;
+        this.tails = [];
+        this.html_score.innerText = "SCORE: 0";
+      }
+      return;
+    }
     moveToTx(x, y, Tx) {
       let res = vec2_exports.create();
       vec2_exports.transformMat3(res, [x, y], Tx);
@@ -1191,9 +1199,6 @@
       this.moveToTx(0, 135, Tx);
       this.lineToTx(0, 142, Tx);
       this.ctx.stroke();
-    }
-    checkTargetCollision(x1, y1, x2, y2) {
-      return x1 == x2 && y1 == y2;
     }
     drawBlock(color) {
       this.ctx.beginPath();
@@ -1287,6 +1292,7 @@
         id = setTimeout(() => {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
           this.snake.update().render().eatTarget(this.target);
+          this.snake.checkTailsCollision();
           this.target.render();
           this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
           this.start();

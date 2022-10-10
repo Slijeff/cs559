@@ -82,7 +82,8 @@ export class Game {
         if (this.started) {
             id = setTimeout(() => {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.snake.update().render().eatTarget(this.target);
+                this.snake.update().render().eatTarget(this.target)
+                this.snake.checkTailsCollision();
                 this.target.render();
                 this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
                 this.start();
