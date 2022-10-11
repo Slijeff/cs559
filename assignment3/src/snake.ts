@@ -14,7 +14,7 @@ export class Snake extends Data {
     private targetCount: number;
     private speed_x: number;
     private speed_y: number;
-    private rotation: number = 0;
+    // private rotation: number = 0;
     private html_score: HTMLParagraphElement;
 
     constructor(size: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, transformation: mat3) {
@@ -101,35 +101,41 @@ export class Snake extends Data {
     }
 
     public changeDirection(direction: string): Snake {
-        // TODO: Disallow changing to opposite direction
         switch (direction) {
             case 'ArrowUp':
             case 'w':
-                this.speed_x = 0;
-                this.speed_y = -Math.abs(this.size);
-                this.rotation = Math.PI / 2;
+                if (this.speed_y !== Math.abs(this.size)) {
+                    this.speed_x = 0;
+                    this.speed_y = -Math.abs(this.size);
+                }
                 break;
             case 'ArrowDown':
             case 's':
-                this.speed_x = 0;
-                this.speed_y = Math.abs(this.size);
+                if (this.speed_y !== -Math.abs(this.size)) {
+                    this.speed_x = 0;
+                    this.speed_y = Math.abs(this.size);
+                }
                 break;
             case 'ArrowLeft':
             case 'a':
-                this.speed_x = -Math.abs(this.size);
-                this.speed_y = 0;
+                if (this.speed_x !== Math.abs(this.size)) {
+                    this.speed_x = -Math.abs(this.size);
+                    this.speed_y = 0;
+                }
                 break;
             case 'ArrowRight':
             case 'd':
-                this.speed_x = Math.abs(this.size);
-                this.speed_y = 0;
+                if (this.speed_x !== -Math.abs(this.size)) {
+                    this.speed_x = Math.abs(this.size);
+                    this.speed_y = 0;
+                }
                 break;
         }
         return this;
     }
 
     public eatTarget(target: Target): Snake {
-        if (this.x == target.x && this.y == target.y) {
+        if (this.x === target.x && this.y === target.y) {
             this.targetCount++;
             target.getRandomLocation(this.getAllTailsLocations());
             this.html_score.innerText = `SCORE: ${this.targetCount}`;
@@ -149,9 +155,9 @@ export class Snake extends Data {
         if (this.getAllTailsLocations().has(JSON.stringify([this.x, this.y]))) {
             this.targetCount = 0;
             this.tails = [];
-            this.html_score.innerText = "SCORE: 0";
+            this.html_score.innerText = `SCORE: ${this.targetCount}`;
         }
-        return
+        return this;
     }
 
     private moveToTx(x, y, Tx) {

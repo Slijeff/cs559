@@ -1049,7 +1049,6 @@
     constructor(size, canvas2, context, transformation) {
       super();
       this.tails = [];
-      this.rotation = 0;
       this.size = size;
       this.canvas = canvas2;
       this.ctx = context;
@@ -1122,30 +1121,37 @@
       switch (direction) {
         case "ArrowUp":
         case "w":
-          this.speed_x = 0;
-          this.speed_y = -Math.abs(this.size);
-          this.rotation = Math.PI / 2;
+          if (this.speed_y !== Math.abs(this.size)) {
+            this.speed_x = 0;
+            this.speed_y = -Math.abs(this.size);
+          }
           break;
         case "ArrowDown":
         case "s":
-          this.speed_x = 0;
-          this.speed_y = Math.abs(this.size);
+          if (this.speed_y !== -Math.abs(this.size)) {
+            this.speed_x = 0;
+            this.speed_y = Math.abs(this.size);
+          }
           break;
         case "ArrowLeft":
         case "a":
-          this.speed_x = -Math.abs(this.size);
-          this.speed_y = 0;
+          if (this.speed_x !== Math.abs(this.size)) {
+            this.speed_x = -Math.abs(this.size);
+            this.speed_y = 0;
+          }
           break;
         case "ArrowRight":
         case "d":
-          this.speed_x = Math.abs(this.size);
-          this.speed_y = 0;
+          if (this.speed_x !== -Math.abs(this.size)) {
+            this.speed_x = Math.abs(this.size);
+            this.speed_y = 0;
+          }
           break;
       }
       return this;
     }
     eatTarget(target) {
-      if (this.x == target.x && this.y == target.y) {
+      if (this.x === target.x && this.y === target.y) {
         this.targetCount++;
         target.getRandomLocation(this.getAllTailsLocations());
         this.html_score.innerText = `SCORE: ${this.targetCount}`;
@@ -1163,9 +1169,9 @@
       if (this.getAllTailsLocations().has(JSON.stringify([this.x, this.y]))) {
         this.targetCount = 0;
         this.tails = [];
-        this.html_score.innerText = "SCORE: 0";
+        this.html_score.innerText = `SCORE: ${this.targetCount}`;
       }
-      return;
+      return this;
     }
     moveToTx(x, y, Tx) {
       let res = vec2_exports.create();
@@ -1274,6 +1280,7 @@
       };
       let pause_btn = document.querySelector("#pause");
       pause_btn.onclick = (ev) => {
+        ev.preventDefault();
         this.snake.pause();
         this.started = false;
       };
@@ -1291,15 +1298,12 @@
       if (this.started) {
         id = setTimeout(() => {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          this.snake.update().render().eatTarget(this.target);
-          this.snake.checkTailsCollision();
+          this.snake.update().render().eatTarget(this.target).checkTailsCollision();
           this.target.render();
           this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
           this.start();
         }, this.tick);
       }
-    }
-    renderGrid() {
     }
   };
 
