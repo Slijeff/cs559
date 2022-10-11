@@ -1168,8 +1168,9 @@
         this.targetCount = 0;
         this.tails = [];
         this.html_score.innerText = `SCORE: ${this.targetCount}`;
+        return true;
       }
-      return this;
+      return false;
     }
     moveToTx(x, y, Tx) {
       let res = vec2_exports.create();
@@ -1296,7 +1297,9 @@
       if (this.started) {
         id = setTimeout(() => {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          this.snake.update().render().eatTarget(this.target).checkTailsCollision();
+          this.snake.update().render().eatTarget(this.target);
+          if (this.snake.checkTailsCollision())
+            this.tick = 100;
           this.target.render();
           this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
           this.start();

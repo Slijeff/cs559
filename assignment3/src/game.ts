@@ -83,8 +83,8 @@ export class Game {
                 this.snake
                     .update()
                     .render()
-                    .eatTarget(this.target)
-                    .checkTailsCollision();
+                    .eatTarget(this.target);
+                if (this.snake.checkTailsCollision()) this.tick = 100;
                 this.target.render();
                 this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
                 this.start();

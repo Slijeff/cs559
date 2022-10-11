@@ -155,13 +155,14 @@ export class Snake {
         return locations;
     }
 
-    public checkTailsCollision(): Snake {
+    public checkTailsCollision(): boolean {
         if (this.getAllTailsLocations().has(JSON.stringify([this.x, this.y]))) {
             this.targetCount = 0;
             this.tails = [];
             this.html_score.innerText = `SCORE: ${this.targetCount}`;
+            return true;
         }
-        return this;
+        return false;
     }
 
     private moveToTx(x, y, Tx) {
