@@ -1016,14 +1016,10 @@
     get y() {
       return this.trans_mat[7];
     }
-    static randomBetween(min2, max2) {
-      return Math.random() * (max2 - min2) + min2;
-    }
     getRandomLocation(tabooLocations) {
       let x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
       let y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
       while (tabooLocations.has(JSON.stringify([x, y]))) {
-        console.log([x, y]);
         x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
         y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
       }
@@ -1040,14 +1036,9 @@
     }
   };
 
-  // data.ts
-  var Data = class {
-  };
-
   // snake.ts
-  var Snake = class extends Data {
+  var Snake = class {
     constructor(size, canvas2, context, transformation) {
-      super();
       this.tails = [];
       this.size = size;
       this.canvas = canvas2;
