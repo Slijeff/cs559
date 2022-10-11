@@ -1059,6 +1059,7 @@
       this.targetCount = 0;
       this.html_score = document.querySelector("#score");
       this.html_score.innerText = "SCORE: 0";
+      this.is_paused = false;
     }
     get x() {
       return this.trans_mat[6];
@@ -1089,7 +1090,7 @@
       for (let i = 0; i < this.tails.length - 1; i++) {
         this.tails[i] = mat3_exports.clone(this.tails[i + 1]);
       }
-      if (this.targetCount > 0) {
+      if (this.targetCount > 0 && !this.is_paused) {
         this.tails[this.targetCount - 1] = mat3_exports.clone(this.trans_mat);
       }
       mat3_exports.translate(this.trans_mat, this.trans_mat, [this.speed_x, this.speed_y]);
@@ -1108,11 +1109,13 @@
       return this;
     }
     start() {
+      this.is_paused = false;
       this.speed_y = -this.size;
       this.speed_x = 0;
       return this;
     }
     pause() {
+      this.is_paused = true;
       this.speed_x = 0;
       this.speed_y = 0;
       return this;
@@ -1125,6 +1128,7 @@
             this.speed_x = 0;
             this.speed_y = -Math.abs(this.size);
           }
+          this.is_paused = false;
           break;
         case "ArrowDown":
         case "s":
@@ -1132,6 +1136,7 @@
             this.speed_x = 0;
             this.speed_y = Math.abs(this.size);
           }
+          this.is_paused = false;
           break;
         case "ArrowLeft":
         case "a":
@@ -1139,6 +1144,7 @@
             this.speed_x = -Math.abs(this.size);
             this.speed_y = 0;
           }
+          this.is_paused = false;
           break;
         case "ArrowRight":
         case "d":
@@ -1146,6 +1152,7 @@
             this.speed_x = Math.abs(this.size);
             this.speed_y = 0;
           }
+          this.is_paused = false;
           break;
       }
       return this;

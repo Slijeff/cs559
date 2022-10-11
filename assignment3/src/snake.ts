@@ -16,6 +16,7 @@ export class Snake extends Data {
     private speed_y: number;
     // private rotation: number = 0;
     private html_score: HTMLParagraphElement;
+    private is_paused: boolean;
 
     constructor(size: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, transformation: mat3) {
         super();
@@ -29,7 +30,7 @@ export class Snake extends Data {
         this.targetCount = 0;
         this.html_score = document.querySelector('#score') as HTMLParagraphElement;
         this.html_score.innerText = "SCORE: 0";
-
+        this.is_paused = false;
     }
 
     public get x(): number {
@@ -66,7 +67,7 @@ export class Snake extends Data {
         for (let i = 0; i < this.tails.length - 1; i++) {
             this.tails[i] = mat3.clone(this.tails[i + 1]);
         }
-        if (this.targetCount > 0) {
+        if (this.targetCount > 0 && !this.is_paused) {
             this.tails[this.targetCount - 1] = mat3.clone(this.trans_mat);
         }
 
@@ -89,12 +90,14 @@ export class Snake extends Data {
     }
 
     public start(): Snake {
+        this.is_paused = false;
         this.speed_y = -this.size;
         this.speed_x = 0;
         return this;
     }
 
     public pause(): Snake {
+        this.is_paused = true;
         this.speed_x = 0;
         this.speed_y = 0;
         return this;
@@ -108,6 +111,7 @@ export class Snake extends Data {
                     this.speed_x = 0;
                     this.speed_y = -Math.abs(this.size);
                 }
+                this.is_paused = false;
                 break;
             case 'ArrowDown':
             case 's':
@@ -115,6 +119,7 @@ export class Snake extends Data {
                     this.speed_x = 0;
                     this.speed_y = Math.abs(this.size);
                 }
+                this.is_paused = false;
                 break;
             case 'ArrowLeft':
             case 'a':
@@ -122,6 +127,7 @@ export class Snake extends Data {
                     this.speed_x = -Math.abs(this.size);
                     this.speed_y = 0;
                 }
+                this.is_paused = false;
                 break;
             case 'ArrowRight':
             case 'd':
@@ -129,6 +135,7 @@ export class Snake extends Data {
                     this.speed_x = Math.abs(this.size);
                     this.speed_y = 0;
                 }
+                this.is_paused = false;
                 break;
         }
         return this;
