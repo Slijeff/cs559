@@ -1083,7 +1083,7 @@
       });
       let center = vec2_exports.create();
       vec2_exports.transformMat3(center, [0, 0], this.trans_mat);
-      this.drawBlock("#d28aff");
+      this.drawBlock("#95bde1");
       return this;
     }
     update() {

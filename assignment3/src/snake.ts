@@ -58,7 +58,7 @@ export class Snake extends Data {
         })
         let center = vec2.create();
         vec2.transformMat3(center, [0, 0], this.trans_mat);
-        this.drawBlock("#d28aff");
+        this.drawBlock("#95bde1");
 
         return this;
     }
