@@ -30,9 +30,6 @@ export class Game {
     }
 
     public init(): void {
-        // this.target = new Target()
-        //     .getRandomLocation()
-        //     .render();
         let snakeTransformMat = mat3.create();
         mat3.fromTranslation(snakeTransformMat, this.start_point);
         this.snake = new Snake(this.size, this.canvas, this.ctx, mat3.clone(snakeTransformMat))
@@ -83,7 +80,11 @@ export class Game {
         if (this.started) {
             id = setTimeout(() => {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.snake.update().render().eatTarget(this.target).checkTailsCollision();
+                this.snake
+                    .update()
+                    .render()
+                    .eatTarget(this.target)
+                    .checkTailsCollision();
                 this.target.render();
                 this.tick = this.tick - this.decay < this.min_tick ? this.min_tick : this.tick - this.decay;
                 this.start();

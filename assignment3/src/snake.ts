@@ -1,10 +1,9 @@
 import {mat3, vec2} from "./esm/index";
 import {Target} from "./target";
-import {Data} from "./data";
 
 type tail = mat3;
 
-export class Snake extends Data {
+export class Snake {
     readonly size: number;
     readonly canvas: HTMLCanvasElement;
     readonly ctx: CanvasRenderingContext2D;
@@ -14,12 +13,10 @@ export class Snake extends Data {
     private targetCount: number;
     private speed_x: number;
     private speed_y: number;
-    // private rotation: number = 0;
     private html_score: HTMLParagraphElement;
     private is_paused: boolean;
 
     constructor(size: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, transformation: mat3) {
-        super();
         this.size = size;
         this.canvas = canvas;
         this.ctx = context;

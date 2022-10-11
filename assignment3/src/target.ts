@@ -5,7 +5,7 @@ export class Target {
     readonly n_cols;
     readonly n_rows;
     private trans_mat: mat3;
-    private size: number;
+    private readonly size: number;
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
 
@@ -29,15 +29,10 @@ export class Target {
         return this.trans_mat[7];
     }
 
-    private static randomBetween(min: number, max: number): number {
-        return Math.random() * (max - min) + min;
-    }
-
     public getRandomLocation(tabooLocations: Set<string>): Target {
         let x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
         let y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
         while (tabooLocations.has(JSON.stringify([x, y]))) {
-            console.log([x, y]);
             x = (Math.floor(Math.random() * this.n_cols - 1) + 1) * this.size;
             y = (Math.floor(Math.random() * this.n_rows - 1) + 1) * this.size;
         }
