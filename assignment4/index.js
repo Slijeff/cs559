@@ -597,15 +597,14 @@
       this.ctx = ctx2;
       this.counter = 0;
       this.prog = document.querySelector("#progress");
+      this.place = document.querySelector("#animate");
+      this.place.disabled = true;
       this.init();
     }
     updateAndRender(ev) {
       const { x, y } = getCursorPosition(this.canvas, ev);
       this.curr_p = [x, y];
-      if (this.counter % 1 == 0) {
-        this.points.push([x, y]);
-      }
-      this.counter = (this.counter + 1) % 100;
+      this.points.push([x, y]);
       this.renderCrude();
     }
     hermit_basis(t, P) {
@@ -633,10 +632,12 @@
       });
       this.canvas.addEventListener("mousedown", () => {
         this.isMouseDown = true;
+        this.place.disabled = true;
         this.clear();
       });
       this.canvas.addEventListener("mouseup", () => {
         this.isMouseDown = false;
+        this.place.disabled = false;
         this.ctx.beginPath();
         this.calculateCurve();
         this.renderHermit();
@@ -649,6 +650,9 @@
       const clear_btn = document.querySelector("#clear");
       clear_btn.addEventListener("click", () => {
         this.clear();
+      });
+      this.place.addEventListener("click", () => {
+        this.animateObject();
       });
     }
     calculateCurve() {
@@ -667,13 +671,17 @@
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.points = [];
       this.hermit_points = [];
+      this.place.disabled = true;
+    }
+    animateObject() {
+      console.log("ssss");
     }
     renderHermit() {
       this.ctx.strokeStyle = "rgba(23,215,232,0.89)";
-      this.ctx.lineWidth = 5;
+      this.ctx.lineWidth = 2;
       let render_p = [];
       for (let i = 0; i < this.hermit_points.length; i++) {
-        for (let t = 0; t <= 1; t += 0.2) {
+        for (let t = 0; t <= 1; t += 0.1) {
           if (this.hermit_points[i]) {
             let res = this.hermit_basis(t, this.hermit_points[i]);
             render_p.push([res[0], res[1]]);
