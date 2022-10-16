@@ -593,7 +593,7 @@
     constructor(canvas2, ctx2) {
       this.render_skip = 8;
       this.interval = 0.01;
-      this.sample_skip = 1;
+      this.sample_skip = 3;
       this.points = [];
       this.hermit_points = [];
       this.render_p = [];
@@ -693,7 +693,7 @@
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderPoints();
       this.ctx.beginPath();
-      this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
+      this.ctx.fillRect(this.render_p[i][0] - 10, this.render_p[i][1] - 10, 20, 20);
       if (i + this.render_skip < this.render_p.length) {
         requestAnimationFrame(() => {
           this.animateObject(i + this.render_skip);

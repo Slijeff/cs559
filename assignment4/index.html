@@ -14,7 +14,7 @@
     .text {
         font-family: Arial, Helvetica, sans-serif;
         font-size: medium;
-        margin: 0.25rem;
+        margin: 0.2rem;
     }
 
     #progressbar {
@@ -45,7 +45,8 @@
       "
 >
     <p class="heading">Assignment 4</p>
-    <p class="text" id="progress"></p>
+    <p class="text">Draw a random path and estimate piecewise Hermite curves</p>
+    <p class="text">Animate an object along the estimated path that matches your draw speed</p>
 
     <canvas
             height="700"
@@ -63,11 +64,11 @@
     <div>
         <div style="display: flex">
             <p class="text">Sample Skip (higher value leads to poor curve estimation):</p>
-            <input id="sample" max="10" min="1" type="range" value="1">
+            <input id="sample" max="10" min="1" type="range" value="3">
         </div>
         <div style="display: flex">
             <p class="text">Render Skip (higher value leads to faster object animation):</p>
-            <input id="render" max="12" min="1" type="range" value="10">
+            <input id="render" max="18" min="1" type="range" value="14">
         </div>
 
     </div>

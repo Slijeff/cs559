@@ -14,7 +14,7 @@ export default class Curve {
     private place: HTMLButtonElement;
     private render_skip: number = 8;
     private readonly interval: number = 0.01;
-    private sample_skip: number = 1;
+    private sample_skip: number = 3;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
         this.points = [];
@@ -131,8 +131,7 @@ export default class Curve {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.renderPoints();
         this.ctx.beginPath();
-        this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
-        // console.log("in", i);
+        this.ctx.fillRect(this.render_p[i][0] - 10, this.render_p[i][1] - 10, 20, 20);
         if (i + this.render_skip < this.render_p.length) {
             requestAnimationFrame(() => {
                 this.animateObject(i + this.render_skip);
