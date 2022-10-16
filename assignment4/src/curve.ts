@@ -4,6 +4,7 @@ import {getCursorPosition} from "../../lib/utils";
 export default class Curve {
     private points: number[][];
     private hermit_points: number[][][];
+    private render_p: number[][];
     private curr_p: vec2;
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
@@ -11,10 +12,12 @@ export default class Curve {
     private counter: number;
     private prog: HTMLParagraphElement;
     private place: HTMLButtonElement;
+    private readonly skip: number = 2;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
         this.points = [];
         this.hermit_points = [];
+        this.render_p = [];
         this.canvas = canvas;
         this.ctx = ctx;
         this.counter = 0;
@@ -27,10 +30,10 @@ export default class Curve {
     public updateAndRender(ev: MouseEvent) {
         const {x, y} = getCursorPosition(this.canvas, ev);
         this.curr_p = [x, y];
-        // if (this.counter % 1 == 0) {
-        this.points.push([x, y])
-        // }
-        // this.counter = (this.counter + 1) % 100;
+        if (this.counter % 10 == 0) {
+            this.points.push([x, y])
+        }
+        this.counter = (this.counter + 1) % 100;
         this.renderCrude();
     }
 
@@ -86,7 +89,7 @@ export default class Curve {
         })
 
         this.place.addEventListener('click', () => {
-            this.animateObject();
+            this.animateObject(0);
         })
     }
 
@@ -100,7 +103,6 @@ export default class Curve {
             let d2 = [p3[0] - p2[0], p3[1] - p2[1]];
             this.hermit_points.push([p1, d1, p2, d2]);
         }
-        console.log("hermit length: ", this.hermit_points.length);
     }
 
     private clear() {
@@ -108,32 +110,47 @@ export default class Curve {
         this.points = [];
         this.hermit_points = [];
         this.place.disabled = true;
+        this.render_p = [];
     }
 
-    private animateObject() {
-        console.log("ssss");
+    private animateObject(i: number) {
+        // console.log(this.render_p);
+        this.ctx.fillStyle = "#ee8a16"
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.renderPoints();
+        this.ctx.beginPath();
+        this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
+        // console.log("in", i);
+        if (i + this.skip < this.render_p.length) {
+            requestAnimationFrame(() => {
+                this.animateObject(i + this.skip);
+            })
+        }
+    }
+
+    private renderPoints() {
+        for (const p of this.render_p) {
+            this.ctx.lineTo(p[0], p[1]);
+        }
+        this.ctx.stroke();
     }
 
     private renderHermit() {
         this.ctx.strokeStyle = 'rgba(23,215,232,0.89)';
         this.ctx.lineWidth = 2;
-        let render_p = [];
         for (let i = 0; i < this.hermit_points.length; i++) {
             for (let t = 0; t <= 1; t += 0.1) {
                 if (this.hermit_points[i]) {
                     let res = this.hermit_basis(t, this.hermit_points[i]);
-                    render_p.push([res[0], res[1]]);
+                    this.render_p.push([res[0], res[1]]);
                 }
             }
         }
 
 
-        for (const p of render_p) {
-            this.ctx.lineTo(p[0], p[1]);
-        }
-        this.ctx.stroke();
+        this.renderPoints();
         this.ctx.beginPath();
-        console.log("render length: ", render_p.length);
+        console.log("render length: ", this.render_p.length);
     }
 
     private renderCrude() {

@@ -591,8 +591,10 @@
   // curve.ts
   var Curve = class {
     constructor(canvas2, ctx2) {
+      this.skip = 2;
       this.points = [];
       this.hermit_points = [];
+      this.render_p = [];
       this.canvas = canvas2;
       this.ctx = ctx2;
       this.counter = 0;
@@ -604,7 +606,10 @@
     updateAndRender(ev) {
       const { x, y } = getCursorPosition(this.canvas, ev);
       this.curr_p = [x, y];
-      this.points.push([x, y]);
+      if (this.counter % 10 == 0) {
+        this.points.push([x, y]);
+      }
+      this.counter = (this.counter + 1) % 100;
       this.renderCrude();
     }
     hermit_basis(t, P) {
@@ -652,7 +657,7 @@
         this.clear();
       });
       this.place.addEventListener("click", () => {
-        this.animateObject();
+        this.animateObject(0);
       });
     }
     calculateCurve() {
@@ -665,35 +670,46 @@
         let d2 = [p3[0] - p2[0], p3[1] - p2[1]];
         this.hermit_points.push([p1, d1, p2, d2]);
       }
-      console.log("hermit length: ", this.hermit_points.length);
     }
     clear() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.points = [];
       this.hermit_points = [];
       this.place.disabled = true;
+      this.render_p = [];
     }
-    animateObject() {
-      console.log("ssss");
+    animateObject(i) {
+      this.ctx.fillStyle = "#ee8a16";
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.renderPoints();
+      this.ctx.beginPath();
+      this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
+      if (i + this.skip < this.render_p.length) {
+        requestAnimationFrame(() => {
+          this.animateObject(i + this.skip);
+        });
+      }
+    }
+    renderPoints() {
+      for (const p of this.render_p) {
+        this.ctx.lineTo(p[0], p[1]);
+      }
+      this.ctx.stroke();
     }
     renderHermit() {
       this.ctx.strokeStyle = "rgba(23,215,232,0.89)";
       this.ctx.lineWidth = 2;
-      let render_p = [];
       for (let i = 0; i < this.hermit_points.length; i++) {
         for (let t = 0; t <= 1; t += 0.1) {
           if (this.hermit_points[i]) {
             let res = this.hermit_basis(t, this.hermit_points[i]);
-            render_p.push([res[0], res[1]]);
+            this.render_p.push([res[0], res[1]]);
           }
         }
       }
-      for (const p of render_p) {
-        this.ctx.lineTo(p[0], p[1]);
-      }
-      this.ctx.stroke();
+      this.renderPoints();
       this.ctx.beginPath();
-      console.log("render length: ", render_p.length);
+      console.log("render length: ", this.render_p.length);
     }
     renderCrude() {
       this.ctx.strokeStyle = "black";
