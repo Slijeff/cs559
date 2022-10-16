@@ -596,9 +596,7 @@
       this.canvas = canvas2;
       this.ctx = ctx2;
       this.counter = 0;
-      this.pbar = document.querySelector("#bar");
       this.prog = document.querySelector("#progress");
-      this.pbar.style.width = "0%";
       this.init();
     }
     updateAndRender(ev) {
@@ -635,8 +633,7 @@
       });
       this.canvas.addEventListener("mousedown", () => {
         this.isMouseDown = true;
-        this.points = [];
-        this.hermit_points = [];
+        this.clear();
       });
       this.canvas.addEventListener("mouseup", () => {
         this.isMouseDown = false;
@@ -678,10 +675,8 @@
       for (let i = 0; i < this.hermit_points.length; i++) {
         for (let t = 0; t <= 1; t += 0.2) {
           if (this.hermit_points[i]) {
-            this.prog.innerText = `${i}`;
             let res = this.hermit_basis(t, this.hermit_points[i]);
             render_p.push([res[0], res[1]]);
-            this.pbar.style.width = `${i / this.hermit_points.length * 100}%`;
           }
         }
       }

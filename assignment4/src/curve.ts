@@ -4,25 +4,20 @@ import {getCursorPosition} from "../../lib/utils";
 export default class Curve {
     private points: number[][];
     private hermit_points: number[][][];
-    private prev_p: vec2;
     private curr_p: vec2;
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     private isMouseDown: boolean;
     private counter: number;
-    private pbar: HTMLDivElement;
     private prog: HTMLParagraphElement;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-        // this.points = [[600, 350], [600, 340], [580, 330]];
         this.points = [];
         this.hermit_points = [];
         this.canvas = canvas;
         this.ctx = ctx;
         this.counter = 0;
-        this.pbar = document.querySelector('#bar') as HTMLDivElement;
         this.prog = document.querySelector('#progress') as HTMLParagraphElement;
-        this.pbar.style.width = "0%";
         this.init();
     }
 
@@ -62,9 +57,9 @@ export default class Curve {
         })
         this.canvas.addEventListener('mousedown', () => {
             this.isMouseDown = true;
-            this.points = [];
-            this.hermit_points = [];
-            // this.clear();
+            // this.points = [];
+            // this.hermit_points = [];
+            this.clear();
         })
 
         this.canvas.addEventListener('mouseup', () => {
@@ -112,12 +107,8 @@ export default class Curve {
         for (let i = 0; i < this.hermit_points.length; i++) {
             for (let t = 0; t <= 1; t += 0.2) {
                 if (this.hermit_points[i]) {
-                    // console.log(i / this.hermit_points.length * 100);
-                    this.prog.innerText = `${i}`
                     let res = this.hermit_basis(t, this.hermit_points[i]);
                     render_p.push([res[0], res[1]]);
-
-                    this.pbar.style.width = `${i / this.hermit_points.length * 100}%`;
                 }
             }
         }
