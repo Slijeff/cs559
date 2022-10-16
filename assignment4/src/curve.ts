@@ -12,7 +12,9 @@ export default class Curve {
     private counter: number;
     private prog: HTMLParagraphElement;
     private place: HTMLButtonElement;
-    private readonly skip: number = 2;
+    private render_skip: number = 8;
+    private readonly interval: number = 0.01;
+    private sample_skip: number = 1;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
         this.points = [];
@@ -30,7 +32,7 @@ export default class Curve {
     public updateAndRender(ev: MouseEvent) {
         const {x, y} = getCursorPosition(this.canvas, ev);
         this.curr_p = [x, y];
-        if (this.counter % 10 == 0) {
+        if (this.counter % this.sample_skip == 0) {
             this.points.push([x, y])
         }
         this.counter = (this.counter + 1) % 100;
@@ -91,6 +93,16 @@ export default class Curve {
         this.place.addEventListener('click', () => {
             this.animateObject(0);
         })
+
+        const skip_slider = document.querySelector('#sample') as HTMLInputElement;
+        skip_slider.addEventListener('change', (ev) => {
+            this.sample_skip = Number.parseInt((ev.target as HTMLInputElement).value);
+        })
+
+        const render_skip_btn = document.querySelector('#render') as HTMLInputElement;
+        render_skip_btn.addEventListener('change', (ev) => {
+            this.render_skip = Number.parseInt((ev.target as HTMLInputElement).value);
+        })
     }
 
     private calculateCurve() {
@@ -121,9 +133,9 @@ export default class Curve {
         this.ctx.beginPath();
         this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
         // console.log("in", i);
-        if (i + this.skip < this.render_p.length) {
+        if (i + this.render_skip < this.render_p.length) {
             requestAnimationFrame(() => {
-                this.animateObject(i + this.skip);
+                this.animateObject(i + this.render_skip);
             })
         }
     }
@@ -137,9 +149,9 @@ export default class Curve {
 
     private renderHermit() {
         this.ctx.strokeStyle = 'rgba(23,215,232,0.89)';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 3;
         for (let i = 0; i < this.hermit_points.length; i++) {
-            for (let t = 0; t <= 1; t += 0.1) {
+            for (let t = 0; t <= 1; t += this.interval) {
                 if (this.hermit_points[i]) {
                     let res = this.hermit_basis(t, this.hermit_points[i]);
                     this.render_p.push([res[0], res[1]]);

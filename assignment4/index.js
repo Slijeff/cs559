@@ -591,7 +591,9 @@
   // curve.ts
   var Curve = class {
     constructor(canvas2, ctx2) {
-      this.skip = 2;
+      this.render_skip = 8;
+      this.interval = 0.01;
+      this.sample_skip = 1;
       this.points = [];
       this.hermit_points = [];
       this.render_p = [];
@@ -606,7 +608,7 @@
     updateAndRender(ev) {
       const { x, y } = getCursorPosition(this.canvas, ev);
       this.curr_p = [x, y];
-      if (this.counter % 10 == 0) {
+      if (this.counter % this.sample_skip == 0) {
         this.points.push([x, y]);
       }
       this.counter = (this.counter + 1) % 100;
@@ -659,6 +661,14 @@
       this.place.addEventListener("click", () => {
         this.animateObject(0);
       });
+      const skip_slider = document.querySelector("#sample");
+      skip_slider.addEventListener("change", (ev) => {
+        this.sample_skip = Number.parseInt(ev.target.value);
+      });
+      const render_skip_btn = document.querySelector("#render");
+      render_skip_btn.addEventListener("change", (ev) => {
+        this.render_skip = Number.parseInt(ev.target.value);
+      });
     }
     calculateCurve() {
       console.log("sample length: ", this.points.length);
@@ -684,9 +694,9 @@
       this.renderPoints();
       this.ctx.beginPath();
       this.ctx.fillRect(this.render_p[i][0] - 5, this.render_p[i][1] - 5, 10, 10);
-      if (i + this.skip < this.render_p.length) {
+      if (i + this.render_skip < this.render_p.length) {
         requestAnimationFrame(() => {
-          this.animateObject(i + this.skip);
+          this.animateObject(i + this.render_skip);
         });
       }
     }
@@ -698,9 +708,9 @@
     }
     renderHermit() {
       this.ctx.strokeStyle = "rgba(23,215,232,0.89)";
-      this.ctx.lineWidth = 2;
+      this.ctx.lineWidth = 3;
       for (let i = 0; i < this.hermit_points.length; i++) {
-        for (let t = 0; t <= 1; t += 0.1) {
+        for (let t = 0; t <= 1; t += this.interval) {
           if (this.hermit_points[i]) {
             let res = this.hermit_basis(t, this.hermit_points[i]);
             this.render_p.push([res[0], res[1]]);

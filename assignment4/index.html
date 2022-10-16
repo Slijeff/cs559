@@ -60,6 +60,18 @@
         <button id="animate">Animate Object</button>
     </div>
 
+    <div>
+        <div style="display: flex">
+            <p class="text">Sample Skip (higher value leads to poor curve estimation):</p>
+            <input id="sample" max="10" min="1" type="range" value="1">
+        </div>
+        <div style="display: flex">
+            <p class="text">Render Skip (higher value leads to faster object animation):</p>
+            <input id="render" max="12" min="1" type="range" value="10">
+        </div>
+
+    </div>
+
 </div>
 <script id="module" src="index.js"></script>
 </body>
