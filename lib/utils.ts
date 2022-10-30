@@ -1,4 +1,4 @@
-import {canvas2d, position} from "./types";
+import {canvas2d} from "./types";
 
 export function getCursorPosition(
     canvas: HTMLCanvasElement,
@@ -14,13 +14,13 @@ export function getCursorPositionRelative(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     event: MouseEvent
-): position {
+): vec2 {
     let loc = getCursorPosition(canvas, event);
     let mat = ctx.getTransform();
     let imat = mat.invertSelf();
-    let x = loc.x * imat.a + loc.y * imat.c + imat.e;
-    let y = loc.x * imat.b + loc.y * imat.d + imat.f;
-    return {x, y};
+    let x = loc[0] * imat.a + loc[1] * imat.c + imat.e;
+    let y = loc[0] * imat.b + loc[1] * imat.d + imat.f;
+    return [x, y];
 }
 
 export function drawBezier(

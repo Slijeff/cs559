@@ -2297,7 +2297,7 @@
         mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
       };
       this.trans_mat = mat4_exports.create();
-      this.eye = vec3_exports.fromValues(20, 20, 30);
+      this.eye = vec3_exports.fromValues(50, 50, 50);
       this.target = vec3_exports.fromValues(0, 0, 0);
       this.up = vec3_exports.fromValues(0, 1, 0);
       mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
