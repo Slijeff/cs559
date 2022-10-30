@@ -14,20 +14,16 @@ export class CanvasEvent {
         canvas.addEventListener('mouseover', (ev) => {
             this.inside = true;
             this.curr = getCursorPosition(canvas, ev);
-            // this.logStates();
         })
         canvas.addEventListener('mouseout', () => {
             this.inside = false;
             this.down = false;
-            // this.logStates();
         })
         canvas.addEventListener('mousedown', () => {
             this.down = true;
-            // this.logStates();
         })
         canvas.addEventListener('mouseup', () => {
             this.down = false;
-            // this.logStates();
         })
     }
 
@@ -39,7 +35,6 @@ export class CanvasEvent {
                 let res = vec2.create();
                 vec2.sub(res, this.curr, this.prev);
                 callback(res);
-                // this.logStates();
             }
         })
     }
