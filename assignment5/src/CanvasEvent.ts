@@ -44,6 +44,15 @@ export class CanvasEvent {
         })
     }
 
+    mouseWheel(callback: (value: number) => void) {
+        this.canvas.addEventListener('wheel', (ev) => {
+            ev.preventDefault();
+            if (this.inside) {
+                callback(ev.deltaY);
+            }
+        })
+    }
+
     private logStates() {
         console.log('down: ', this.down, 'inside: ', this.inside, 'curr: ', this.curr);
     }

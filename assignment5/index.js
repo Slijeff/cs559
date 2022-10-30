@@ -2239,19 +2239,6 @@
     return { canvas, ctx };
   }
 
-  // Orthoproject.ts
-  var Orthoproject = class {
-    constructor() {
-      this.trans_mat = mat4_exports.create();
-    }
-    transformTo(t) {
-      this.trans_mat = mat4_exports.create();
-      mat4_exports.ortho(this.trans_mat, -100, 100, -100, 100, -1, 1);
-      mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
-      return this;
-    }
-  };
-
   // CanvasEvent.ts
   var CanvasEvent = class {
     constructor() {
@@ -2283,8 +2270,37 @@
         }
       });
     }
+    mouseWheel(callback) {
+      this.canvas.addEventListener("wheel", (ev) => {
+        ev.preventDefault();
+        if (this.inside) {
+          callback(ev.deltaY);
+        }
+      });
+    }
     logStates() {
       console.log("down: ", this.down, "inside: ", this.inside, "curr: ", this.curr);
+    }
+  };
+
+  // Orthoproject.ts
+  var Orthoproject = class {
+    constructor() {
+      this.moveDistance = (value) => {
+        const val = value / 10;
+        this.distance += val;
+        mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
+      };
+      this.trans_mat = mat4_exports.create();
+      this.distance = 100;
+      this.event = new CanvasEvent();
+      this.event.mouseWheel(this.moveDistance);
+    }
+    transformTo(t) {
+      this.trans_mat = mat4_exports.create();
+      mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
+      mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
+      return this;
     }
   };
 
