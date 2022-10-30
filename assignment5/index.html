@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Assignment 5</title>
+</head>
+<body>
+<style>
+    .heading {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: larger;
+        margin: 1rem;
+    }
+
+    .text {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: medium;
+        margin: 0.2rem;
+    }
+
+    #progressbar {
+        background-color: black;
+        border-radius: 13px;
+        /* (height of inner div) / 2 + padding */
+        padding: 3px;
+        width: 500px;
+        margin-bottom: 10px;
+    }
+
+    #bar {
+        background-color: orange;
+        /*width: 0%;*/
+        /* Adjust with JavaScript */
+        height: 20px;
+        border-radius: 10px;
+    }
+</style>
+<div
+        style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 100px 200px;
+        height: 80vh;
+      "
+>
+    <p class="heading">Assignment 5</p>
+
+    <canvas
+            height="700"
+            id="myCanvas"
+            style="border: 1px solid grey; border-radius: 10px;"
+            width="1200"
+    >
+    </canvas>
+
+    <div>
+
+    </div>
+
+</div>
+<script id="module" src="index.js"></script>
+</body>
+</html>
