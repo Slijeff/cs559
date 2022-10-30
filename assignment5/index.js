@@ -2329,51 +2329,90 @@
 
   // World.ts
   var World = class {
-    constructor(ctx) {
+    constructor(ctx, scale5) {
       this.trans_mat = mat4_exports.create();
       this.context = ctx;
+      this.scale = scale5;
     }
-    renderAxes(color, scale5) {
-      let Tx = mat4_exports.clone(this.trans_mat);
-      mat4_exports.scale(Tx, Tx, [scale5, scale5, scale5]);
+    renderAxes(color) {
       this.context.strokeStyle = color;
       this.context.beginPath();
-      moveToTx([1.2, 0, 0], Tx, this.context);
-      lineToTx([-1.2, 0, 0], Tx, this.context);
-      moveToTx([0, 0, 0], Tx, this.context);
-      lineToTx([0, 1.2, 0], Tx, this.context);
-      lineToTx([0, -1.2, 0], Tx, this.context);
-      moveToTx([0, 0, 0], Tx, this.context);
-      lineToTx([0, 0, 1.2], Tx, this.context);
-      lineToTx([0, 0, -1.2], Tx, this.context);
-      moveToTx([1.1, 0.05, 0], Tx, this.context);
-      lineToTx([1.2, 0, 0], Tx, this.context);
-      lineToTx([1.1, -0.05, 0], Tx, this.context);
-      moveToTx([0.05, 1.1, 0], Tx, this.context);
-      lineToTx([0, 1.2, 0], Tx, this.context);
-      lineToTx([-0.05, 1.1, 0], Tx, this.context);
-      moveToTx([0.05, 0, 1.1], Tx, this.context);
-      lineToTx([0, 0, 1.2], Tx, this.context);
-      lineToTx([-0.05, 0, 1.1], Tx, this.context);
-      moveToTx([1.3, -0.05, 0], Tx, this.context);
-      lineToTx([1.4, 0.05, 0], Tx, this.context);
-      moveToTx([1.3, 0.05, 0], Tx, this.context);
-      lineToTx([1.4, -0.05, 0], Tx, this.context);
-      moveToTx([-0.05, 1.4, 0], Tx, this.context);
-      lineToTx([0, 1.35, 0], Tx, this.context);
-      lineToTx([0.05, 1.4, 0], Tx, this.context);
-      moveToTx([0, 1.35, 0], Tx, this.context);
-      lineToTx([0, 1.28, 0], Tx, this.context);
-      moveToTx([-0.05, 0, 1.3], Tx, this.context);
-      lineToTx([0.05, 0, 1.3], Tx, this.context);
-      lineToTx([-0.05, 0, 1.4], Tx, this.context);
-      lineToTx([0.05, 0, 1.4], Tx, this.context);
+      moveToTx([1.2, 0, 0], this.trans_mat, this.context);
+      lineToTx([-1.2, 0, 0], this.trans_mat, this.context);
+      moveToTx([0, 0, 0], this.trans_mat, this.context);
+      lineToTx([0, 1.2, 0], this.trans_mat, this.context);
+      lineToTx([0, -1.2, 0], this.trans_mat, this.context);
+      moveToTx([0, 0, 0], this.trans_mat, this.context);
+      lineToTx([0, 0, 1.2], this.trans_mat, this.context);
+      lineToTx([0, 0, -1.2], this.trans_mat, this.context);
+      moveToTx([1.1, 0.05, 0], this.trans_mat, this.context);
+      lineToTx([1.2, 0, 0], this.trans_mat, this.context);
+      lineToTx([1.1, -0.05, 0], this.trans_mat, this.context);
+      moveToTx([0.05, 1.1, 0], this.trans_mat, this.context);
+      lineToTx([0, 1.2, 0], this.trans_mat, this.context);
+      lineToTx([-0.05, 1.1, 0], this.trans_mat, this.context);
+      moveToTx([0.05, 0, 1.1], this.trans_mat, this.context);
+      lineToTx([0, 0, 1.2], this.trans_mat, this.context);
+      lineToTx([-0.05, 0, 1.1], this.trans_mat, this.context);
+      moveToTx([1.3, -0.05, 0], this.trans_mat, this.context);
+      lineToTx([1.4, 0.05, 0], this.trans_mat, this.context);
+      moveToTx([1.3, 0.05, 0], this.trans_mat, this.context);
+      lineToTx([1.4, -0.05, 0], this.trans_mat, this.context);
+      moveToTx([-0.05, 1.4, 0], this.trans_mat, this.context);
+      lineToTx([0, 1.35, 0], this.trans_mat, this.context);
+      lineToTx([0.05, 1.4, 0], this.trans_mat, this.context);
+      moveToTx([0, 1.35, 0], this.trans_mat, this.context);
+      lineToTx([0, 1.28, 0], this.trans_mat, this.context);
+      moveToTx([-0.05, 0, 1.3], this.trans_mat, this.context);
+      lineToTx([0.05, 0, 1.3], this.trans_mat, this.context);
+      lineToTx([-0.05, 0, 1.4], this.trans_mat, this.context);
+      lineToTx([0.05, 0, 1.4], this.trans_mat, this.context);
       this.context.stroke();
     }
     transformTo(t) {
       this.trans_mat = mat4_exports.create();
+      mat4_exports.scale(this.trans_mat, this.trans_mat, [this.scale, this.scale, this.scale]);
       mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
       return this;
+    }
+  };
+
+  // Cube.ts
+  var Cube = class {
+    constructor(ctx, scale5) {
+      this.context = ctx;
+      this.scale = scale5;
+    }
+    transformTo(t) {
+      this.trans_mat = mat4_exports.create();
+      const center = this.scale / 2;
+      mat4_exports.fromTranslation(this.trans_mat, [-center, -center, -center]);
+      mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
+      return this;
+    }
+    render() {
+      this.context.fillStyle = "blue";
+      this.context.beginPath();
+      moveToTx([0, 0, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([0, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([0, 0, 0], this.trans_mat, this.context);
+      this.context.fill();
+      this.context.beginPath();
+      moveToTx([0, 0, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([0, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([0, 0, 0], this.trans_mat, this.context);
+      this.context.fill();
+      this.context.beginPath();
+      moveToTx([0, 0, 0], this.trans_mat, this.context);
+      lineToTx([0, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([0, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([0, 0, 0], this.trans_mat, this.context);
+      this.context.fill();
     }
   };
 
@@ -2382,14 +2421,17 @@
     constructor() {
       this.render = () => {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.world.transformTo(
-          this.camera.transformTo(
-            this.projection.transformTo(
-              this.viewport
+        this.cube.transformTo(
+          this.world.transformTo(
+            this.camera.transformTo(
+              this.projection.transformTo(
+                this.viewport
+              )
             )
           )
         );
-        this.world.renderAxes("grey", 3e4);
+        this.world.renderAxes("grey");
+        this.cube.render();
         requestAnimationFrame(this.render);
       };
       const { canvas, ctx } = get2dCanvas();
@@ -2398,7 +2440,8 @@
       this.viewport = new Viewport(canvas);
       this.projection = new Orthoproject();
       this.camera = new Camera();
-      this.world = new World(ctx);
+      this.world = new World(ctx, 4e4);
+      this.cube = new Cube(ctx, 0.1);
     }
   };
 
