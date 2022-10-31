@@ -2313,7 +2313,7 @@
         mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
       };
       this.trans_mat = mat4_exports.create();
-      this.eye = vec3_exports.fromValues(50, 50, 50);
+      this.eye = vec3_exports.fromValues(20, 40, 50);
       this.target = vec3_exports.fromValues(0, 0, 0);
       this.up = vec3_exports.fromValues(0, 1, 0);
       mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
@@ -2407,7 +2407,7 @@
       return this;
     }
     render() {
-      this.context.fillStyle = "blue";
+      this.context.fillStyle = "#0044ff";
       this.context.beginPath();
       moveToTx([0, 0, 0], this.trans_mat, this.context);
       lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
@@ -2429,6 +2429,30 @@
       lineToTx([0, this.scale, 0], this.trans_mat, this.context);
       lineToTx([0, 0, 0], this.trans_mat, this.context);
       this.context.fill();
+      this.context.fillStyle = "#1d5aff";
+      this.context.beginPath();
+      moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([0, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      this.context.fill();
+      this.context.fillStyle = "#0044ff";
+      this.context.beginPath();
+      moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      this.context.fill();
+      this.context.fillStyle = "#1d5aff";
+      this.context.beginPath();
+      moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
+      lineToTx([0, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
+      lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
+      this.context.fill();
     }
   };
 
@@ -2437,15 +2461,14 @@
     constructor() {
       this.render = () => {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.cube.transformTo(
-          this.world.transformTo(
-            this.camera.transformTo(
-              this.projection.transformTo(
-                this.viewport
-              )
+        this.world.transformTo(
+          this.camera.transformTo(
+            this.projection.transformTo(
+              this.viewport
             )
           )
         );
+        this.cube.transformTo(this.world);
         this.world.renderAxes("grey");
         this.cube.render();
         requestAnimationFrame(this.render);

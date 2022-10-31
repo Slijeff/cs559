@@ -30,15 +30,15 @@ export class System {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.cube.transformTo(
-            this.world.transformTo(
-                this.camera.transformTo(
-                    this.projection.transformTo(
-                        this.viewport
-                    )
+        this.world.transformTo(
+            this.camera.transformTo(
+                this.projection.transformTo(
+                    this.viewport
                 )
             )
         )
+        this.cube.transformTo(this.world);
+
         this.world.renderAxes("grey");
         this.cube.render();
         requestAnimationFrame(this.render);
