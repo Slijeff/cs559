@@ -2292,7 +2292,7 @@
         mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
       };
       this.trans_mat = mat4_exports.create();
-      this.distance = 100;
+      this.distance = 150;
       this.event = new CanvasEvent();
       this.event.mouseWheel(this.moveDistance);
     }
@@ -2492,12 +2492,14 @@
         );
         this.sun.transformTo(this.world);
         this.planet1.transformTo(this.sun);
+        this.planet2.transformTo(this.sun);
         this.planet1_moon1.transformTo(this.planet1);
         if (this.gridCheckbox.checked) {
           this.world.renderAxes("grey");
         }
         this.sun.render();
         this.planet1.render();
+        this.planet2.render();
         this.planet1_moon1.render();
         requestAnimationFrame(this.render);
       };
@@ -2508,7 +2510,7 @@
       this.projection = new Orthoproject();
       this.camera = new Camera();
       this.world = new World(ctx, 4e4);
-      const scale5 = 0.2;
+      const scale5 = 0.35;
       this.sun = new Cube(
         ctx,
         scale5,
@@ -2520,7 +2522,7 @@
       this.planet1 = new Cube(
         ctx,
         0.1,
-        [0.5, 0.5, 0],
+        [0.6, 0.6, 0],
         true,
         [1, 1, 1],
         0.7,
@@ -2529,11 +2531,20 @@
       this.planet1_moon1 = new Cube(
         ctx,
         0.05,
-        [0.2, 0.2, -0.2],
+        [0.15, 0.15, -0.15],
         true,
         [-1, -1, -1],
-        0.8,
+        1,
         [26, 186, 9]
+      );
+      this.planet2 = new Cube(
+        ctx,
+        0.2,
+        [0.6, -0.6, 0.4],
+        true,
+        [-1, -1, -1],
+        0.25,
+        [75, 9, 186]
       );
       this.gridCheckbox = new Checkbox("#grid");
     }

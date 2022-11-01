@@ -9,7 +9,7 @@ export class Orthoproject implements Transformable {
 
     constructor() {
         this.trans_mat = mat4.create();
-        this.distance = 100;
+        this.distance = 150;
         this.event = new CanvasEvent();
         this.event.mouseWheel(this.moveDistance);
     }
