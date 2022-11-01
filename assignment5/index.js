@@ -2283,27 +2283,6 @@
     }
   };
 
-  // Orthoproject.ts
-  var Orthoproject = class {
-    constructor() {
-      this.moveDistance = (value) => {
-        const val = value / 10;
-        this.distance += val;
-        mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
-      };
-      this.trans_mat = mat4_exports.create();
-      this.distance = 150;
-      this.event = new CanvasEvent();
-      this.event.mouseWheel(this.moveDistance);
-    }
-    transformTo(t) {
-      this.trans_mat = mat4_exports.create();
-      mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
-      mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
-      return this;
-    }
-  };
-
   // Camera.ts
   var Camera = class {
     constructor() {
@@ -2313,7 +2292,7 @@
         mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
       };
       this.trans_mat = mat4_exports.create();
-      this.eye = vec3_exports.fromValues(20, 40, 50);
+      this.eye = vec3_exports.fromValues(30, 40, 50);
       this.target = vec3_exports.fromValues(0, 0, 0);
       this.up = vec3_exports.fromValues(0, 1, 0);
       mat4_exports.lookAt(this.trans_mat, this.eye, this.target, this.up);
@@ -2327,7 +2306,7 @@
       return this;
     }
     inLimit(val) {
-      return this.eye[0] + -val / 10 >= 0;
+      return true;
     }
   };
 
@@ -2342,6 +2321,23 @@
     vec3_exports.transformMat4(res, loc, Tx);
     context.lineTo(res[0], res[1]);
   }
+  var Queue = class {
+    constructor(capacity = Infinity) {
+      this.capacity = capacity;
+      this.storage = [];
+    }
+    enqueue(item) {
+      if (this.size() <= this.capacity) {
+        this.storage.push(item);
+      }
+    }
+    dequeue() {
+      return this.storage.shift();
+    }
+    size() {
+      return this.storage.length;
+    }
+  };
 
   // World.ts
   var World = class {
@@ -2385,6 +2381,17 @@
       lineToTx([0.05, 0, 1.4], this.trans_mat, this.context);
       this.context.stroke();
     }
+    renderCubeTrace(t) {
+      this.context.strokeStyle = `rgba(${t.rgb_color[0]}, ${t.rgb_color[1]}, ${t.rgb_color[2]})`;
+      this.context.beginPath();
+      for (let i = 0; i < t.prev_mat_queue.size(); i++) {
+        lineToTx([0, 0, 0], t.prev_mat_queue.storage[i], this.context);
+      }
+      this.context.stroke();
+      if (t.prev_mat_queue.size() >= 30) {
+        t.prev_mat_queue.dequeue();
+      }
+    }
     transformTo(t) {
       this.trans_mat = mat4_exports.create();
       mat4_exports.scale(this.trans_mat, this.trans_mat, [this.scale, this.scale, this.scale]);
@@ -2396,6 +2403,10 @@
   // Cube.ts
   var Cube = class {
     constructor(ctx, scale5, location, rotate3 = false, rotate_vec = [1, 1, 1], speed = 0.2, color = [0, 68, 255]) {
+      this.trans_mat = [0, 0, 0];
+      this.isInit = true;
+      this.step = 10;
+      this.counter = 0;
       this.context = ctx;
       this.scale = scale5;
       this.location = location;
@@ -2403,8 +2414,16 @@
       this.speed = speed;
       this.rgb_color = color;
       this.rotate_vec = rotate_vec;
+      this.prev_mat_queue = new Queue(1e3);
     }
     transformTo(t) {
+      if (this.isInit)
+        this.next = t;
+      this.isInit = false;
+      if (this.counter % this.step === 0) {
+        this.prev_mat_queue.enqueue(mat4_exports.clone(this.trans_mat));
+      }
+      this.counter = (this.counter + 1) % this.step;
       this.trans_mat = mat4_exports.create();
       const rad = this.deg * Math.PI / 180;
       mat4_exports.fromTranslation(this.trans_mat, this.location);
@@ -2478,6 +2497,27 @@
     }
   };
 
+  // Orthoproject.ts
+  var Orthoproject = class {
+    constructor() {
+      this.moveDistance = (value) => {
+        const val = value / 10;
+        this.distance += val;
+        mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
+      };
+      this.trans_mat = mat4_exports.create();
+      this.distance = 150;
+      this.event = new CanvasEvent();
+      this.event.mouseWheel(this.moveDistance);
+    }
+    transformTo(t) {
+      this.trans_mat = mat4_exports.create();
+      mat4_exports.ortho(this.trans_mat, -this.distance, this.distance, -this.distance, this.distance, -1, 1);
+      mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
+      return this;
+    }
+  };
+
   // System.ts
   var System = class {
     constructor() {
@@ -2496,6 +2536,9 @@
         this.planet1_moon1.transformTo(this.planet1);
         if (this.gridCheckbox.checked) {
           this.world.renderAxes("grey");
+          this.world.renderCubeTrace(this.planet1_moon1);
+          this.world.renderCubeTrace(this.planet1);
+          this.world.renderCubeTrace(this.planet2);
         }
         this.sun.render();
         this.planet1.render();
@@ -2534,7 +2577,7 @@
         [0.15, 0.15, -0.15],
         true,
         [-1, -1, -1],
-        1,
+        2,
         [26, 186, 9]
       );
       this.planet2 = new Cube(

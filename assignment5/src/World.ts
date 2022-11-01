@@ -1,6 +1,7 @@
 import {Transformable} from "./Transformable";
 import {mat4} from "./esm/index";
 import {lineToTx, moveToTx} from "./utils";
+import {Cube} from "./Cube";
 
 export class World implements Transformable {
     trans_mat: mat4;
@@ -54,6 +55,19 @@ export class World implements Transformable {
         lineToTx([.05, 0, 1.4], this.trans_mat, this.context);
 
         this.context.stroke();
+    }
+
+    renderCubeTrace(t: Cube) {
+        this.context.strokeStyle = `rgba(${t.rgb_color[0]}, ${t.rgb_color[1]}, ${t.rgb_color[2]})`
+        this.context.beginPath();
+        for (let i = 0; i < t.prev_mat_queue.size(); i++) {
+            lineToTx([0, 0, 0], t.prev_mat_queue.storage[i], this.context);
+        }
+        this.context.stroke();
+        if (t.prev_mat_queue.size() >= 30) {
+            t.prev_mat_queue.dequeue();
+        }
+
     }
 
     transformTo(t: Transformable): this {

@@ -1,10 +1,10 @@
 import {Viewport} from "./Viewport";
 import {get2dCanvas} from "../../lib/utils";
-import {Orthoproject} from "./Orthoproject";
 import {Camera} from "./Camera";
 import {World} from "./World";
 import {Cube} from "./Cube";
 import {Checkbox} from "./Checkbox";
+import {Orthoproject} from "./Orthoproject";
 
 export class System {
     private readonly viewport: Viewport;
@@ -52,7 +52,7 @@ export class System {
             [.15, .15, -.15],
             true,
             [-1, -1, -1],
-            1,
+            2,
             [26, 186, 9]
         )
         this.planet2 = new Cube(
@@ -85,6 +85,9 @@ export class System {
 
         if (this.gridCheckbox.checked) {
             this.world.renderAxes("grey");
+            this.world.renderCubeTrace(this.planet1_moon1);
+            this.world.renderCubeTrace(this.planet1);
+            this.world.renderCubeTrace(this.planet2);
         }
         this.sun.render();
         this.planet1.render();

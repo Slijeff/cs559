@@ -1,10 +1,10 @@
 import {Transformable} from "./Transformable";
 import {mat4} from "./esm/index";
-import {lineToTx, moveToTx} from "./utils";
+import {lineToTx, moveToTx, Queue} from "./utils";
 
 // noinspection DuplicatedCode
 export class Cube implements Transformable {
-    trans_mat: mat4;
+    trans_mat: mat4 = [0, 0, 0];
     context: CanvasRenderingContext2D;
     scale: number;
     location: vec3;
@@ -12,6 +12,11 @@ export class Cube implements Transformable {
     speed: number;
     rgb_color: vec3;
     rotate_vec: vec3;
+    next: Transformable;
+    isInit: boolean = true;
+    prev_mat_queue: Queue<mat4>;
+    step: number = 10;
+    counter: number = 0;
 
     constructor(ctx: CanvasRenderingContext2D,
                 scale: number,
@@ -28,9 +33,16 @@ export class Cube implements Transformable {
         this.speed = speed;
         this.rgb_color = color;
         this.rotate_vec = rotate_vec;
+        this.prev_mat_queue = new Queue<mat4>(1000);
     }
 
     transformTo(t: Transformable): this {
+        if (this.isInit) this.next = t;
+        this.isInit = false;
+        if (this.counter % this.step === 0) {
+            this.prev_mat_queue.enqueue(mat4.clone(this.trans_mat));
+        }
+        this.counter = (this.counter + 1) % this.step;
         this.trans_mat = mat4.create()
         const rad = this.deg * Math.PI / 180
         mat4.fromTranslation(this.trans_mat, this.location)
