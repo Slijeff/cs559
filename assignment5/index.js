@@ -2395,23 +2395,25 @@
 
   // Cube.ts
   var Cube = class {
-    constructor(ctx, scale5, location, rotate3 = false, speed = 0.2) {
+    constructor(ctx, scale5, location, rotate3 = false, rotate_vec = [1, 1, 1], speed = 0.2, color = [0, 68, 255]) {
       this.context = ctx;
       this.scale = scale5;
       this.location = location;
       this.deg = rotate3 ? 1 : 0;
       this.speed = speed;
+      this.rgb_color = color;
+      this.rotate_vec = rotate_vec;
     }
     transformTo(t) {
       this.trans_mat = mat4_exports.create();
       const rad = this.deg * Math.PI / 180;
       mat4_exports.fromTranslation(this.trans_mat, this.location);
-      mat4_exports.rotate(this.trans_mat, this.trans_mat, rad, [1, 1, 1]);
+      mat4_exports.rotate(this.trans_mat, this.trans_mat, rad, this.rotate_vec);
       mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
       return this;
     }
     render() {
-      this.context.fillStyle = "rgba(0, 68, 255)";
+      this.context.fillStyle = `rgba(${this.rgb_color[0]}, ${this.rgb_color[1]}, ${this.rgb_color[2]})`;
       this.context.beginPath();
       moveToTx([0, 0, 0], this.trans_mat, this.context);
       lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
@@ -2426,7 +2428,7 @@
       lineToTx([0, this.scale, 0], this.trans_mat, this.context);
       lineToTx([0, 0, 0], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "rgba(29, 90, 255)";
+      this.context.fillStyle = `rgba(${this.rgb_color[0] + 30}, ${this.rgb_color[1] + 30}, ${this.rgb_color[2]})`;
       this.context.beginPath();
       moveToTx([0, 0, 0], this.trans_mat, this.context);
       lineToTx([0, 0, this.scale], this.trans_mat, this.context);
@@ -2441,7 +2443,7 @@
       lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "rgba(0, 68, 255)";
+      this.context.fillStyle = `rgba(${this.rgb_color[0]}, ${this.rgb_color[1]}, ${this.rgb_color[2]})`;
       this.context.beginPath();
       moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
@@ -2449,7 +2451,7 @@
       lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "rgba(29, 90, 255)";
+      this.context.fillStyle = `rgba(${this.rgb_color[0] + 30}, ${this.rgb_color[1] + 30}, ${this.rgb_color[2]})`;
       this.context.beginPath();
       moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
@@ -2488,11 +2490,15 @@
             )
           )
         );
-        this.cube.transformTo(this.world);
+        this.sun.transformTo(this.world);
+        this.planet1.transformTo(this.sun);
+        this.planet1_moon1.transformTo(this.planet1);
         if (this.gridCheckbox.checked) {
           this.world.renderAxes("grey");
         }
-        this.cube.render();
+        this.sun.render();
+        this.planet1.render();
+        this.planet1_moon1.render();
         requestAnimationFrame(this.render);
       };
       const { canvas, ctx } = get2dCanvas();
@@ -2502,8 +2508,33 @@
       this.projection = new Orthoproject();
       this.camera = new Camera();
       this.world = new World(ctx, 4e4);
-      const scale5 = 0.1;
-      this.cube = new Cube(ctx, scale5, [-scale5 / 2, -scale5 / 2, -scale5 / 2], true);
+      const scale5 = 0.2;
+      this.sun = new Cube(
+        ctx,
+        scale5,
+        [-scale5 / 2, -scale5 / 2, -scale5 / 2],
+        true,
+        [-1, -1, -1],
+        0.3
+      );
+      this.planet1 = new Cube(
+        ctx,
+        0.1,
+        [0.5, 0.5, 0],
+        true,
+        [1, 1, 1],
+        0.7,
+        [255, 60, 41]
+      );
+      this.planet1_moon1 = new Cube(
+        ctx,
+        0.05,
+        [0.2, 0.2, -0.2],
+        true,
+        [-1, -1, -1],
+        0.8,
+        [26, 186, 9]
+      );
       this.gridCheckbox = new Checkbox("#grid");
     }
   };
