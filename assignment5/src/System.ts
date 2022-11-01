@@ -26,7 +26,7 @@ export class System {
         this.camera = new Camera()
         this.world = new World(ctx, 4e4)
         const scale = .1;
-        this.cube = new Cube(ctx, scale, [-scale / 2, -scale / 2, -scale / 2])
+        this.cube = new Cube(ctx, scale, [-scale / 2, -scale / 2, -scale / 2], true)
         this.gridCheckbox = new Checkbox('#grid')
     }
 

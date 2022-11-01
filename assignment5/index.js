@@ -2395,20 +2395,23 @@
 
   // Cube.ts
   var Cube = class {
-    constructor(ctx, scale5, location) {
+    constructor(ctx, scale5, location, rotate3 = false, speed = 0.2) {
       this.context = ctx;
       this.scale = scale5;
       this.location = location;
+      this.deg = rotate3 ? 1 : 0;
+      this.speed = speed;
     }
     transformTo(t) {
       this.trans_mat = mat4_exports.create();
-      const center = this.scale / 2;
+      const rad = this.deg * Math.PI / 180;
       mat4_exports.fromTranslation(this.trans_mat, this.location);
+      mat4_exports.rotate(this.trans_mat, this.trans_mat, rad, [1, 1, 1]);
       mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
       return this;
     }
     render() {
-      this.context.fillStyle = "#0044ff";
+      this.context.fillStyle = "rgba(0, 68, 255)";
       this.context.beginPath();
       moveToTx([0, 0, 0], this.trans_mat, this.context);
       lineToTx([this.scale, 0, 0], this.trans_mat, this.context);
@@ -2423,6 +2426,7 @@
       lineToTx([0, this.scale, 0], this.trans_mat, this.context);
       lineToTx([0, 0, 0], this.trans_mat, this.context);
       this.context.fill();
+      this.context.fillStyle = "rgba(29, 90, 255)";
       this.context.beginPath();
       moveToTx([0, 0, 0], this.trans_mat, this.context);
       lineToTx([0, 0, this.scale], this.trans_mat, this.context);
@@ -2430,7 +2434,6 @@
       lineToTx([0, this.scale, 0], this.trans_mat, this.context);
       lineToTx([0, 0, 0], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "#1d5aff";
       this.context.beginPath();
       moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
@@ -2438,7 +2441,7 @@
       lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "#0044ff";
+      this.context.fillStyle = "rgba(0, 68, 255)";
       this.context.beginPath();
       moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, 0], this.trans_mat, this.context);
@@ -2446,7 +2449,7 @@
       lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       this.context.fill();
-      this.context.fillStyle = "#1d5aff";
+      this.context.fillStyle = "rgba(29, 90, 255)";
       this.context.beginPath();
       moveToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       lineToTx([0, this.scale, this.scale], this.trans_mat, this.context);
@@ -2454,6 +2457,9 @@
       lineToTx([this.scale, 0, this.scale], this.trans_mat, this.context);
       lineToTx([this.scale, this.scale, this.scale], this.trans_mat, this.context);
       this.context.fill();
+      if (this.deg !== 0) {
+        this.deg = (this.deg + this.speed) % 360;
+      }
     }
   };
 
@@ -2497,7 +2503,7 @@
       this.camera = new Camera();
       this.world = new World(ctx, 4e4);
       const scale5 = 0.1;
-      this.cube = new Cube(ctx, scale5, [-scale5 / 2, -scale5 / 2, -scale5 / 2]);
+      this.cube = new Cube(ctx, scale5, [-scale5 / 2, -scale5 / 2, -scale5 / 2], true);
       this.gridCheckbox = new Checkbox("#grid");
     }
   };
