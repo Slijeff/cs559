@@ -5,18 +5,20 @@ import {lineToTx, moveToTx} from "./utils";
 // noinspection DuplicatedCode
 export class Cube implements Transformable {
     trans_mat: mat4;
-    context: CanvasRenderingContext2D
-    scale: number
+    context: CanvasRenderingContext2D;
+    scale: number;
+    location: vec3;
 
-    constructor(ctx: CanvasRenderingContext2D, scale: number) {
+    constructor(ctx: CanvasRenderingContext2D, scale: number, location: vec3) {
         this.context = ctx;
         this.scale = scale;
+        this.location = location;
     }
 
     transformTo(t: Transformable): this {
         this.trans_mat = mat4.create()
         const center = this.scale / 2
-        mat4.fromTranslation(this.trans_mat, [-center, -center, -center])
+        mat4.fromTranslation(this.trans_mat, this.location)
         mat4.multiply(this.trans_mat, t.trans_mat, this.trans_mat)
         return this;
     }

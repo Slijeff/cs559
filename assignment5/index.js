@@ -2395,14 +2395,15 @@
 
   // Cube.ts
   var Cube = class {
-    constructor(ctx, scale5) {
+    constructor(ctx, scale5, location) {
       this.context = ctx;
       this.scale = scale5;
+      this.location = location;
     }
     transformTo(t) {
       this.trans_mat = mat4_exports.create();
       const center = this.scale / 2;
-      mat4_exports.fromTranslation(this.trans_mat, [-center, -center, -center]);
+      mat4_exports.fromTranslation(this.trans_mat, this.location);
       mat4_exports.multiply(this.trans_mat, t.trans_mat, this.trans_mat);
       return this;
     }
@@ -2456,6 +2457,19 @@
     }
   };
 
+  // Checkbox.ts
+  var Checkbox = class {
+    constructor(querySelector) {
+      this.selection = document.querySelector(querySelector);
+      this.selection.addEventListener("change", (ev) => {
+        this.selection.checked = !!this.selection.checked;
+      });
+    }
+    get checked() {
+      return this.selection.checked;
+    }
+  };
+
   // System.ts
   var System = class {
     constructor() {
@@ -2469,7 +2483,9 @@
           )
         );
         this.cube.transformTo(this.world);
-        this.world.renderAxes("grey");
+        if (this.gridCheckbox.checked) {
+          this.world.renderAxes("grey");
+        }
         this.cube.render();
         requestAnimationFrame(this.render);
       };
@@ -2480,7 +2496,9 @@
       this.projection = new Orthoproject();
       this.camera = new Camera();
       this.world = new World(ctx, 4e4);
-      this.cube = new Cube(ctx, 0.1);
+      const scale5 = 0.1;
+      this.cube = new Cube(ctx, scale5, [-scale5 / 2, -scale5 / 2, -scale5 / 2]);
+      this.gridCheckbox = new Checkbox("#grid");
     }
   };
 

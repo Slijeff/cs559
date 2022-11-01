@@ -4,6 +4,7 @@ import {Orthoproject} from "./Orthoproject";
 import {Camera} from "./Camera";
 import {World} from "./World";
 import {Cube} from "./Cube";
+import {Checkbox} from "./Checkbox";
 
 export class System {
     private readonly viewport: Viewport;
@@ -12,7 +13,8 @@ export class System {
     private world: World;
     private ctx: CanvasRenderingContext2D;
     private canvas: HTMLCanvasElement;
-    private readonly cube: Cube
+    private readonly cube: Cube;
+    private gridCheckbox: Checkbox;
 
     constructor() {
         const {canvas, ctx} = get2dCanvas()
@@ -23,7 +25,9 @@ export class System {
         // this.projection = new Perspectiveproject(canvas)
         this.camera = new Camera()
         this.world = new World(ctx, 4e4)
-        this.cube = new Cube(ctx, .1)
+        const scale = .1;
+        this.cube = new Cube(ctx, scale, [-scale / 2, -scale / 2, -scale / 2])
+        this.gridCheckbox = new Checkbox('#grid')
     }
 
     render = () => {
@@ -39,7 +43,9 @@ export class System {
         )
         this.cube.transformTo(this.world);
 
-        this.world.renderAxes("grey");
+        if (this.gridCheckbox.checked) {
+            this.world.renderAxes("grey");
+        }
         this.cube.render();
         requestAnimationFrame(this.render);
 
