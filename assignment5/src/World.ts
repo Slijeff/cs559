@@ -17,6 +17,7 @@ export class World implements Transformable {
     renderAxes(color: string) {
 
         this.context.strokeStyle = color;
+        this.context.lineWidth = 1;
         this.context.beginPath();
         // Axes
         moveToTx([1.2, 0, 0], this.trans_mat, this.context);
@@ -59,12 +60,13 @@ export class World implements Transformable {
 
     renderCubeTrace(t: Cube) {
         this.context.strokeStyle = `rgba(${t.rgb_color[0]}, ${t.rgb_color[1]}, ${t.rgb_color[2]})`
+        this.context.lineWidth = 2;
         this.context.beginPath();
         for (let i = 0; i < t.prev_mat_queue.size(); i++) {
             lineToTx([0, 0, 0], t.prev_mat_queue.storage[i], this.context);
         }
         this.context.stroke();
-        if (t.prev_mat_queue.size() >= 30) {
+        if (t.prev_mat_queue.size() >= 20) {
             t.prev_mat_queue.dequeue();
         }
 
