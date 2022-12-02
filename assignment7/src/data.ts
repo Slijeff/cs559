@@ -24,6 +24,10 @@ export const vertexColors = new Float32Array(
         .5, .5, .5, .5, .5, .5, .5, .5, .5, .5, .5, .5]
 )
 
+export const vertexNormals = new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0,
+    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,])
+
 export const triangleIndices = new Uint8Array(
     [0, 1, 2, 0, 2, 3,    // front
         4, 5, 6, 4, 6, 7,    // right

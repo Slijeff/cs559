@@ -1,18 +1,24 @@
-import {triangleIndices, vertexColors, vertexPos} from "./data";
-import {mat4} from "./esm/index";
+import {triangleIndices, vertexColors, vertexNormals, vertexPos} from "./data";
+import {mat3, mat4} from "./esm/index";
 
 export default class GLcanvas {
     private trianglePosBuffer_itemSize = 3;
     private trianglePosBuffer_numItems = 24;
     private colorBuffer_itemSize = 3;
     private colorBuffer_numItems = 24;
+    private normalBuffer_itemSize = 3;
+    private normalBuffer_numItems = 24;
     private MVPmatrix: WebGLUniformLocation;
     private trianglePosBuffer: WebGLBuffer;
+    private normalBuffer: WebGLBuffer;
     private colorBuffer: WebGLBuffer;
     private indexBuffer: WebGLBuffer;
     private shader_prog;
     private color_attr;
     private pos_attr;
+    private normal_attr;
+    private MVNormalmatrix: WebGLUniformLocation;
+    private MVmatrix: WebGLUniformLocation;
 
     private angle1: number;
     private angle2: number;
@@ -76,7 +82,12 @@ export default class GLcanvas {
         this.gl.enableVertexAttribArray(this.pos_attr);
         this.color_attr = this.gl.getAttribLocation(this.shader_prog, "vColor")
         this.gl.enableVertexAttribArray(this.color_attr);
+        this.normal_attr = this.gl.getAttribLocation(this.shader_prog, "vNormal")
+        this.gl.enableVertexAttribArray(this.normal_attr);
+
         this.MVPmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVP");
+        this.MVmatrix = this.gl.getUniformLocation(this.shader_prog, "uMV");
+        this.MVNormalmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVn");
 
         // buffering
         console.info("buffering...")
@@ -91,6 +102,12 @@ export default class GLcanvas {
         this.gl.bufferData(this.gl.ARRAY_BUFFER, vertexColors, this.gl.STATIC_DRAW);
         this.colorBuffer_itemSize = 3;
         this.colorBuffer_numItems = 24;
+
+        this.normalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertexNormals, this.gl.STATIC_DRAW);
+        this.normalBuffer_itemSize = 3;
+        this.normalBuffer_numItems = 24;
 
         this.indexBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
@@ -107,7 +124,7 @@ export default class GLcanvas {
 
         const tModel = mat4.create();
         mat4.fromScaling(tModel, [100, 100, 100]);
-        mat4.rotate(tModel, tModel, this.angle2, [1, 0, 1]);
+        mat4.rotate(tModel, tModel, this.angle2, [1, 1, 1]);
 
         const tCamera = mat4.create();
         mat4.lookAt(tCamera, eye, target, up);
@@ -115,9 +132,12 @@ export default class GLcanvas {
         const tProjection = mat4.create();
         mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, 1000);
 
+        const tMV = mat4.create();
+        const tMVn = mat3.create();
         const tMVP = mat4.create();
-        mat4.multiply(tMVP, tCamera, tModel); // "modelView" matrix
-        mat4.multiply(tMVP, tProjection, tMVP);
+        mat4.multiply(tMV, tCamera, tModel);
+        mat3.normalFromMat4(tMVn, tMV); // "modelView" matrix
+        mat4.multiply(tMVP, tProjection, tMV);
 
         // Clear screen, prepare for rendering
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -126,12 +146,17 @@ export default class GLcanvas {
 
         // Set up uniforms & attributes
         this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP);
+        this.gl.uniformMatrix3fv(this.MVNormalmatrix, false, tMVn);
+        this.gl.uniformMatrix4fv(this.MVmatrix, false, tMV);
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         this.gl.vertexAttribPointer(this.color_attr, this.colorBuffer_itemSize,
             this.gl.FLOAT, false, 0, 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.trianglePosBuffer);
         this.gl.vertexAttribPointer(this.pos_attr, this.trianglePosBuffer_itemSize,
+            this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        this.gl.vertexAttribPointer(this.normal_attr, this.normalBuffer_itemSize,
             this.gl.FLOAT, false, 0, 0);
 
         // Do the drawing
@@ -142,8 +167,8 @@ export default class GLcanvas {
     }
 
     private dataUpdate() {
-        this.angle1 = Math.sin(performance.now() * 0.001);
-        this.angle2 = Math.cos(performance.now() * 0.001);
+        this.angle1 = Math.cos(performance.now() * 0.001);
+        this.angle2 = Math.sin(performance.now() * 0.001);
     }
 
 }
