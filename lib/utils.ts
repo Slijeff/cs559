@@ -1,4 +1,4 @@
-import {canvas2d} from "./types";
+import {canvas2d, canvasGL} from "./types";
 
 export function getCursorPosition(
     canvas: HTMLCanvasElement,
@@ -42,6 +42,12 @@ export function get2dCanvas(): canvas2d {
     let canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
     let ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     return {canvas, ctx};
+}
+
+export function getGLCanvas(): canvasGL {
+    let canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
+    let gl = canvas.getContext("webgl") as WebGLRenderingContext;
+    return {canvas, gl};
 }
 
 export function drawAxis(ctx: CanvasRenderingContext2D) {
