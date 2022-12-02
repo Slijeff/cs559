@@ -19,6 +19,7 @@ export default class GLcanvas {
     private normal_attr;
     private MVNormalmatrix: WebGLUniformLocation;
     private MVmatrix: WebGLUniformLocation;
+    private time: WebGLUniformLocation;
 
     private angle1: number;
     private angle2: number;
@@ -60,6 +61,7 @@ export default class GLcanvas {
         this.MVPmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVP");
         this.MVmatrix = this.gl.getUniformLocation(this.shader_prog, "uMV");
         this.MVNormalmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVn");
+        this.time = this.gl.getUniformLocation(this.shader_prog, "time");
 
         // buffering
         console.info("buffering...")
@@ -120,6 +122,7 @@ export default class GLcanvas {
         this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP);
         this.gl.uniformMatrix3fv(this.MVNormalmatrix, false, tMVn);
         this.gl.uniformMatrix4fv(this.MVmatrix, false, tMV);
+        this.gl.uniform1f(this.time, performance.now());
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         this.gl.vertexAttribPointer(this.color_attr, this.colorBuffer_itemSize,
