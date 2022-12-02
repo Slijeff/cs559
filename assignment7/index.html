@@ -75,55 +75,6 @@
         fColor = vColor;
         fNormal = vNormal;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 <script id="fragShader" type="shader">
     precision highp float;
@@ -153,58 +104,12 @@
 
     void main(void) {
 	   vec3 n = normalize(uMVn * fNormal);
+	   vec3 v = normalize(-fPosition);
         vec3 ColorS  = blinnPhongDir(lightV,n,0.0   ,0.0,     0.0,     specularC,specularE).y*lightCol;
         vec3 ColorAD = blinnPhongDir(lightV,n,lightI,ambientC,diffuseC,0.0,      1.0      ).x*objectCol;
+
         gl_FragColor = vec4(ColorAD+ColorS,1.0);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 <script id="module" src="index.js"></script>
 </body>
