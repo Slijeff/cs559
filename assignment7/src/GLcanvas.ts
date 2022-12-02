@@ -44,36 +44,8 @@ export default class GLcanvas {
     }
 
     public init() {
-        console.info("initializing...")
-        const vertex_source = (document.getElementById('vertextShader') as HTMLScriptElement).text;
-        const frag_source = (document.getElementById('fragShader') as HTMLScriptElement).text;
 
-        // compile shaders
-        console.info("compiling vertext...")
-        const vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);
-        this.gl.shaderSource(vertex_shader, vertex_source);
-        this.gl.compileShader(vertex_shader);
-        if (!this.gl.getShaderParameter(vertex_shader, this.gl.COMPILE_STATUS)) {
-            console.error("compiling vertex shader failed: ", this.gl.getShaderInfoLog(vertex_shader));
-        }
-
-        console.info("compiling fragment...")
-        const frag_shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-        this.gl.shaderSource(frag_shader, frag_source);
-        this.gl.compileShader(frag_shader);
-        if (!this.gl.getShaderParameter(frag_shader, this.gl.COMPILE_STATUS)) {
-            console.error("compiling vertex shader failed: ", this.gl.getShaderInfoLog(frag_shader));
-        }
-
-        // link
-        console.info("linking...")
-        this.shader_prog = this.gl.createProgram();
-        this.gl.attachShader(this.shader_prog, vertex_shader);
-        this.gl.attachShader(this.shader_prog, frag_shader);
-        this.gl.linkProgram(this.shader_prog);
-        if (!this.gl.getProgramParameter(this.shader_prog, this.gl.LINK_STATUS)) {
-            console.error("linking error");
-        }
+        this.shader_prog = this.createProgramFromScript('vertexShader', 'fragShader');
         this.gl.useProgram(this.shader_prog);
 
         // setup attributes
@@ -169,6 +141,38 @@ export default class GLcanvas {
     private dataUpdate() {
         this.angle1 = Math.cos(performance.now() * 0.001);
         this.angle2 = Math.sin(performance.now() * 0.001);
+    }
+
+    private compileShader(source: string, shaderType: number): WebGLShader {
+        const shader = this.gl.createShader(shaderType);
+        this.gl.shaderSource(shader, source);
+        this.gl.compileShader(shader);
+        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+            console.error("compiling shader failed: ", this.gl.getShaderInfoLog(shader));
+        }
+        return shader;
+    }
+
+    private createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram {
+        const program = this.gl.createProgram();
+        this.gl.attachShader(program, vertexShader);
+        this.gl.attachShader(program, fragmentShader);
+        this.gl.linkProgram(program);
+        if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+            console.error("linking error: ", this.gl.getProgramInfoLog(program));
+        }
+        return program;
+    }
+
+    private createShaderFromScript(id: string, shaderType: number): WebGLShader {
+        const source = (document.getElementById(id) as HTMLScriptElement).text;
+        return this.compileShader(source, shaderType);
+    }
+
+    private createProgramFromScript(vertexId: string, fragId:string): WebGLProgram {
+        const vertex_shader = this.createShaderFromScript(vertexId, this.gl.VERTEX_SHADER);
+        const frag_shader = this.createShaderFromScript(fragId, this.gl.FRAGMENT_SHADER);
+        return this.createProgram(vertex_shader, frag_shader);
     }
 
 }
