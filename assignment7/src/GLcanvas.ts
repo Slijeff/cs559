@@ -58,6 +58,7 @@ export default class GLcanvas {
         this.normal_attr = this.gl.getAttribLocation(this.shader_prog, "vNormal")
         this.gl.enableVertexAttribArray(this.normal_attr);
 
+        // setup uniforms
         this.MVPmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVP");
         this.MVmatrix = this.gl.getUniformLocation(this.shader_prog, "uMV");
         this.MVNormalmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVn");
@@ -92,13 +93,20 @@ export default class GLcanvas {
 
     public render = () => {
 
-        const eye = [500 * Math.sin(this.angle1), 200, 500 * Math.cos(this.angle1)];
+        const eye = [600, 200, 600];
         const target = [0, 0, 0];
         const up = [0, 1, 0];
 
         const tModel = mat4.create();
-        mat4.fromScaling(tModel, [100, 100, 100]);
-        mat4.rotate(tModel, tModel, this.angle2, [1, 1, 1]);
+        mat4.fromScaling(tModel, [50, 50, 50]);
+        mat4.rotate(tModel, tModel, this.angle2, [1, 0, 1]);
+        mat4.rotate(tModel, tModel, this.angle1, [0, 0, 1]);
+
+        const tModel2 = mat4.create();
+        mat4.fromTranslation(tModel2, [150, 150, 0]);
+        mat4.scale(tModel2, tModel2, [50, 50, 50]);
+        mat4.rotate(tModel2, tModel2, this.angle1, [1, 0, 1]);
+        mat4.rotate(tModel2, tModel2, this.angle2, [0, 0, 1]);
 
         const tCamera = mat4.create();
         mat4.lookAt(tCamera, eye, target, up);
@@ -107,11 +115,18 @@ export default class GLcanvas {
         mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, 1000);
 
         const tMV = mat4.create();
+        const tMV2 = mat4.create();
         const tMVn = mat3.create();
+        const tMVn2 = mat3.create();
         const tMVP = mat4.create();
+        const tMVP2 = mat4.create();
         mat4.multiply(tMV, tCamera, tModel);
         mat3.normalFromMat4(tMVn, tMV); // "modelView" matrix
         mat4.multiply(tMVP, tProjection, tMV);
+
+        mat4.multiply(tMV2, tCamera, tModel2);
+        mat3.normalFromMat4(tMVn2, tMV2); // "modelView" matrix
+        mat4.multiply(tMVP2, tProjection, tMV2);
 
         // Clear screen, prepare for rendering
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -122,7 +137,7 @@ export default class GLcanvas {
         this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP);
         this.gl.uniformMatrix3fv(this.MVNormalmatrix, false, tMVn);
         this.gl.uniformMatrix4fv(this.MVmatrix, false, tMV);
-        this.gl.uniform1f(this.time, performance.now());
+        this.gl.uniform1f(this.time, performance.now() * .001);
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         this.gl.vertexAttribPointer(this.color_attr, this.colorBuffer_itemSize,
@@ -135,6 +150,22 @@ export default class GLcanvas {
             this.gl.FLOAT, false, 0, 0);
 
         // Do the drawing
+        this.gl.drawElements(this.gl.TRIANGLES, triangleIndices.length, this.gl.UNSIGNED_BYTE, 0);
+
+        // Set up uniforms & attributes
+        this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP2);
+        this.gl.uniformMatrix3fv(this.MVNormalmatrix, false, tMVn2);
+        this.gl.uniformMatrix4fv(this.MVmatrix, false, tMV2);
+
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+        this.gl.vertexAttribPointer(this.color_attr, this.colorBuffer_itemSize,
+            this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.trianglePosBuffer);
+        this.gl.vertexAttribPointer(this.pos_attr, this.trianglePosBuffer_itemSize,
+            this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        this.gl.vertexAttribPointer(this.normal_attr, this.normalBuffer_itemSize,
+            this.gl.FLOAT, false, 0, 0);
         this.gl.drawElements(this.gl.TRIANGLES, triangleIndices.length, this.gl.UNSIGNED_BYTE, 0);
 
         this.dataUpdate();
