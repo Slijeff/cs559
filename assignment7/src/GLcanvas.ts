@@ -1,5 +1,6 @@
 import {triangleIndices, vertexColors, vertexNormals, vertexPos} from "./data";
 import {mat3, mat4} from "./esm/index";
+import {DrawParams} from "./DrawParams";
 
 export default class GLcanvas {
     private trianglePosBuffer_itemSize = 3;
@@ -93,45 +94,51 @@ export default class GLcanvas {
 
     public render = () => {
 
+        // Clear screen, prepare for rendering
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+        this.drawCube({});
+        this.drawCube({
+            translate: [100, 100, 0]
+        });
+
+        this.dataUpdate();
+        requestAnimationFrame(this.render);
+    }
+
+    private drawCube(
+        {
+            scale = [50, 50, 50],
+            rotate = [],
+            translate = [0, 0, 0]
+
+        }: DrawParams
+    ) {
         const eye = [600, 200, 600];
         const target = [0, 0, 0];
         const up = [0, 1, 0];
 
-        const tModel = mat4.create();
-        mat4.fromScaling(tModel, [50, 50, 50]);
-        mat4.rotate(tModel, tModel, this.angle2, [1, 0, 1]);
-        mat4.rotate(tModel, tModel, this.angle1, [0, 0, 1]);
-
-        const tModel2 = mat4.create();
-        mat4.fromTranslation(tModel2, [150, 150, 0]);
-        mat4.scale(tModel2, tModel2, [50, 50, 50]);
-        mat4.rotate(tModel2, tModel2, this.angle1, [1, 0, 1]);
-        mat4.rotate(tModel2, tModel2, this.angle2, [0, 0, 1]);
-
         const tCamera = mat4.create();
         mat4.lookAt(tCamera, eye, target, up);
+
+        const tModel = mat4.create();
+        mat4.fromTranslation(tModel, translate);
+        mat4.scale(tModel, tModel, scale);
+        rotate.forEach((rot) => {
+            mat4.rotate(tModel, tModel, rot.rotateDeg , rot.rotateVec);
+        })
 
         const tProjection = mat4.create();
         mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, 1000);
 
         const tMV = mat4.create();
-        const tMV2 = mat4.create();
         const tMVn = mat3.create();
-        const tMVn2 = mat3.create();
         const tMVP = mat4.create();
-        const tMVP2 = mat4.create();
         mat4.multiply(tMV, tCamera, tModel);
         mat3.normalFromMat4(tMVn, tMV); // "modelView" matrix
         mat4.multiply(tMVP, tProjection, tMV);
-
-        mat4.multiply(tMV2, tCamera, tModel2);
-        mat3.normalFromMat4(tMVn2, tMV2); // "modelView" matrix
-        mat4.multiply(tMVP2, tProjection, tMV2);
-
-        // Clear screen, prepare for rendering
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        this.gl.enable(this.gl.DEPTH_TEST);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // Set up uniforms & attributes
         this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP);
@@ -152,24 +159,6 @@ export default class GLcanvas {
         // Do the drawing
         this.gl.drawElements(this.gl.TRIANGLES, triangleIndices.length, this.gl.UNSIGNED_BYTE, 0);
 
-        // Set up uniforms & attributes
-        this.gl.uniformMatrix4fv(this.MVPmatrix, false, tMVP2);
-        this.gl.uniformMatrix3fv(this.MVNormalmatrix, false, tMVn2);
-        this.gl.uniformMatrix4fv(this.MVmatrix, false, tMV2);
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
-        this.gl.vertexAttribPointer(this.color_attr, this.colorBuffer_itemSize,
-            this.gl.FLOAT, false, 0, 0);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.trianglePosBuffer);
-        this.gl.vertexAttribPointer(this.pos_attr, this.trianglePosBuffer_itemSize,
-            this.gl.FLOAT, false, 0, 0);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
-        this.gl.vertexAttribPointer(this.normal_attr, this.normalBuffer_itemSize,
-            this.gl.FLOAT, false, 0, 0);
-        this.gl.drawElements(this.gl.TRIANGLES, triangleIndices.length, this.gl.UNSIGNED_BYTE, 0);
-
-        this.dataUpdate();
-        requestAnimationFrame(this.render);
     }
 
     private dataUpdate() {
@@ -203,7 +192,7 @@ export default class GLcanvas {
         return this.compileShader(source, shaderType);
     }
 
-    private createProgramFromScript(vertexId: string, fragId:string): WebGLProgram {
+    private createProgramFromScript(vertexId: string, fragId: string): WebGLProgram {
         const vertex_shader = this.createShaderFromScript(vertexId, this.gl.VERTEX_SHADER);
         const frag_shader = this.createShaderFromScript(fragId, this.gl.FRAGMENT_SHADER);
         return this.createProgram(vertex_shader, frag_shader);
