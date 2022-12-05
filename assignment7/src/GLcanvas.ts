@@ -1,4 +1,4 @@
-import {triangleIndices, vertexColors, vertexNormals, vertexPos} from "./data";
+import {triangleIndices, vertexNormals, vertexPos} from "./data";
 import {mat3, mat4} from "./esm/index";
 import {DrawParams} from "./DrawParams";
 
@@ -21,9 +21,11 @@ export default class GLcanvas {
     private MVNormalmatrix: WebGLUniformLocation;
     private MVmatrix: WebGLUniformLocation;
     private time: WebGLUniformLocation;
+    private vertCol: Float32Array;
 
     private angle1: number;
     private angle2: number;
+    private positions: number[];
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -73,9 +75,15 @@ export default class GLcanvas {
         this.trianglePosBuffer_itemSize = 3;
         this.trianglePosBuffer_numItems = 24;
 
+        const temp = []
+        for (let i = 0; i < 72; i++) {
+            temp.push(this.randomBetween(0, 1));
+        }
+        this.vertCol = new Float32Array(temp);
+
         this.colorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertexColors, this.gl.STATIC_DRAW);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertCol, this.gl.STATIC_DRAW);
         this.colorBuffer_itemSize = 3;
         this.colorBuffer_numItems = 24;
 
@@ -90,22 +98,81 @@ export default class GLcanvas {
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, triangleIndices, this.gl.STATIC_DRAW);
 
         console.info("init done")
+        this.positions = [];
+        for (let i = 0; i < 100; i++) {
+            this.positions.push(this.randomBetween(-1, 1) * 10);
+        }
+
     }
 
     public render = () => {
 
         // Clear screen, prepare for rendering
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearColor(Math.sin(performance.now() * .0013),
+                            Math.cos(performance.now() * .0014),
+                            Math.tan(performance.now() * .0016),
+            .5);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-        this.drawCube({});
-        this.drawCube({
-            translate: [100, 100, 0]
-        });
+        const num_cube = 10
+        for (let i = 0; i < num_cube; i++) {
+            this.drawCube({
+                translate: [0, 0, this.positions[i] * 50],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+            this.drawCube({
+                translate: [0, this.positions[i] * 50, 0],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+            this.drawCube({
+                translate: [this.positions[i] * 50, 0, 0],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+            this.drawCube({
+                translate: [this.positions[i] * 50, this.positions[i] * 50, 0],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+            this.drawCube({
+                translate: [0, this.positions[i] * 50, this.positions[i] * 50],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+            this.drawCube({
+                translate: [this.positions[i] * 50, 0, this.positions[i] * 50],
+                rotate: [{
+                    rotateDeg: Math.sin(performance.now() * .001),
+                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+                }
+                ]
+            });
+        }
 
         this.dataUpdate();
         requestAnimationFrame(this.render);
+    }
+
+    private randomBetween(min: number, max: number): number {
+        return Math.random() * (max - min) + min;
     }
 
     private drawCube(
@@ -116,7 +183,8 @@ export default class GLcanvas {
 
         }: DrawParams
     ) {
-        const eye = [600, 200, 600];
+        // const eye = [600, Math.sin(performance.now() * .001) * 500, 600];
+        const eye = [this.angle1 * 200, this.angle2 * 200, 600];
         const target = [0, 0, 0];
         const up = [0, 1, 0];
 
@@ -127,11 +195,11 @@ export default class GLcanvas {
         mat4.fromTranslation(tModel, translate);
         mat4.scale(tModel, tModel, scale);
         rotate.forEach((rot) => {
-            mat4.rotate(tModel, tModel, rot.rotateDeg , rot.rotateVec);
+            mat4.rotate(tModel, tModel, rot.rotateDeg, rot.rotateVec);
         })
 
         const tProjection = mat4.create();
-        mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, 1000);
+        mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, undefined);
 
         const tMV = mat4.create();
         const tMVn = mat3.create();
@@ -162,8 +230,8 @@ export default class GLcanvas {
     }
 
     private dataUpdate() {
-        this.angle1 = Math.cos(performance.now() * 0.001);
-        this.angle2 = Math.sin(performance.now() * 0.001);
+        // this.angle1 = Math.cos(performance.now() * 0.001);
+        // this.angle2 = Math.sin(performance.now() * 0.001);
     }
 
     private compileShader(source: string, shaderType: number): WebGLShader {
