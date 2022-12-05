@@ -1,16 +1,15 @@
-import { Viewport } from "./Viewport";
-import { get2dCanvas } from "../../lib/utils";
-import { Camera } from "./Camera";
-import { World } from "./World";
-import { Cube } from "./Cube";
-import { Checkbox } from "./Checkbox";
-import { Orthoproject } from "./Orthoproject";
-import { FPStracker } from "./FPStracker";
-import { Perspectiveproject } from "./Perspectiveproject";
+import {Viewport} from "./Viewport";
+import {get2dCanvas} from "../../lib/utils";
+import {Camera} from "./Camera";
+import {World} from "./World";
+import {Cube} from "./Cube";
+import {Checkbox} from "./Checkbox";
+import {Orthoproject} from "./Orthoproject";
+import {FPStracker} from "./FPStracker";
 
 export class System {
   private readonly viewport: Viewport;
-  private readonly projection: Perspectiveproject;
+  private readonly projection: Orthoproject;
   private readonly camera: Camera;
   private readonly world: World;
   private ctx: CanvasRenderingContext2D;
@@ -25,7 +24,7 @@ export class System {
     this.ctx = ctx;
     this.canvas = canvas;
     this.viewport = new Viewport(canvas);
-    this.projection = new Perspectiveproject(canvas);
+    this.projection = new Orthoproject();
     this.camera = new Camera();
     this.world = new World(ctx, 4e4);
     const scale = 0.35;

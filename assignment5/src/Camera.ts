@@ -11,7 +11,7 @@ export class Camera implements Transformable {
 
     constructor() {
         this.trans_mat = mat4.create()
-        this.eye = vec3.fromValues(30, 40, 50)
+        this.eye = vec3.fromValues(20, 30, 40)
         this.target = vec3.fromValues(0, 0, 0)
         this.up = vec3.fromValues(0, 1, 0)
         mat4.lookAt(this.trans_mat, this.eye, this.target, this.up)

@@ -13,7 +13,7 @@ export class Perspectiveproject implements Transformable {
     transformTo(t: Transformable): this {
         mat4.perspective(
             this.trans_mat,
-            0.001,
+            Math.PI / 10,
             this.canvas.width / this.canvas.height,
             -1,
             null
