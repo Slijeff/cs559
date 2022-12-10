@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "ES2016",
+        "allowUnreachableCode": false,
+        "alwaysStrict": true,
+        "allowJs": true
+    }
+}

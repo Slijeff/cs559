@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Assignment 8</title>
+</head>
+<body>
+<style>
+    .heading {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: larger;
+        margin: 1rem;
+    }
+
+    .text {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: medium;
+        margin: 0.2rem;
+    }
+
+    #progressbar {
+        background-color: black;
+        border-radius: 13px;
+        /* (height of inner div) / 2 + padding */
+        padding: 3px;
+        width: 500px;
+        margin-bottom: 10px;
+    }
+
+    #bar {
+        background-color: orange;
+        /*width: 0%;*/
+        /* Adjust with JavaScript */
+        height: 20px;
+        border-radius: 10px;
+    }
+</style>
+<div
+        style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 100px 200px;
+        height: 80vh;
+      "
+>
+    <p class="heading">Assignment 8</p>
+    <p class="text">Refresh to see randomized cube positions</p>
+    <canvas
+            height="700"
+            id="myCanvas"
+            style="border: 1px solid grey; border-radius: 10px;"
+            width="1200"
+    >
+    </canvas>
+
+    <div>
+        <label for="slider1">Angle1</label><input id="slider1" max="2" min="-2" step="0.1" type="range" value="-2"/>
+        <label for="slider2">Angle2</label><input id="slider2" max="2" min="-2" step="0.1" type="range" value="-2"/>
+    </div>
+
+</div>
+<script id="vertexShader" type="shader">
+attribute vec3 vPosition;
+attribute vec3 vColor;
+attribute vec3 vNormal;
+varying vec3 fPosition;
+varying vec3 fColor;
+varying vec3 fNormal;
+uniform mat4 uMVP;
+uniform mat4 uMV;
+uniform float time;
+mat4 rotationX( in float angle ) {
+	return mat4(	1.0,		0,			0,			0,
+			 		0, 	cos(angle),	-sin(angle),		0,
+					0, 	sin(angle),	 cos(angle),		0,
+					0, 			0,			  0, 		1);
+}
+
+mat4 rotationY( in float angle ) {
+	return mat4(	cos(angle),		0,		sin(angle),	0,
+			 				0,		1.0,			 0,	0,
+					-sin(angle),	0,		cos(angle),	0,
+							0, 		0,				0,	1);
+}
+
+mat4 rotationZ( in float angle ) {
+	return mat4(	cos(angle),		-sin(angle),	0,	0,
+			 		sin(angle),		cos(angle),		0,	0,
+							0,				0,		1,	0,
+							0,				0,		0,	1);
+}
+void main(void) {
+    vec4 modified = vec4(vPosition, 1.0);
+    //modified *= rotationX(sin(time * .001)) * rotationY(cos(time * .001));
+    gl_Position = uMVP * modified;
+    fPosition = (uMV * vec4(vPosition, 1.0)).xyz;
+    fColor = vColor;
+    fNormal = vNormal;
+}
+</script>
+<script id="fragShader" type="shader">
+precision highp float;
+varying vec3 fPosition;
+varying vec3 fColor;
+varying vec3 fNormal;
+uniform mat3 uMVn;
+uniform float time;
+
+vec3  lightV    = vec3(sin(time),1.0,sin(time));
+const float lightI    = 1.0;               // only for diffuse component
+const float ambientC  = 0.15;
+const float diffuseC  = 0.4;
+const float specularC = 1.0;
+const float specularE = 20.0;
+const vec3  lightCol  = vec3(1,1,1);
+const vec3  objectCol = vec3(.8,0.6,0.0); // yellow-ish orange
+
+vec2 blinnPhongDir(vec3 lightDir, vec3 n, float lightInt, float Ka,
+float Kd, float Ks, float shininess) {
+    vec3 s = normalize(lightDir);
+    vec3 v = normalize(-fPosition);
+    vec3 h = normalize(v+s);
+    float diffuse = Ka + Kd * lightInt * max(0.0, dot(n, s));
+    float spec =  Ks * pow(max(0.0, dot(n,h)), shininess);
+    return vec2(diffuse, spec);
+}
+
+void main(void) {
+    vec3 n = normalize(uMVn * fNormal);
+    vec3 v = normalize(-fPosition);
+    vec3 ColorS  = blinnPhongDir(lightV,n,0.0   ,0.0,     0.0,     specularC,specularE).y*lightCol;
+    vec3 ColorAD = blinnPhongDir(lightV,n,lightI,ambientC,diffuseC,0.0,      1.0      ).x*fColor;
+
+    gl_FragColor = vec4(ColorAD+ColorS,1.0);
+}
+</script>
+<script id="module" src="index.js"></script>
+</body>
+</html>
