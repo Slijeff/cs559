@@ -150,63 +150,26 @@ export default class GLcanvas {
     public render = () => {
 
         // Clear screen, prepare for rendering
-        this.gl.clearColor(Math.sin(performance.now() * .0013),
-            Math.cos(performance.now() * .0014),
-            Math.tan(performance.now() * .0016),
-            .5);
+        this.gl.clearColor(0 ,0, 0,
+            .9);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         const num_cube = 10
         for (let i = 0; i < num_cube; i++) {
-            this.drawCube({
-                translate: [0, 0, this.positions[i] * 50],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
+            for (let j = 0; j < num_cube; j++ ) {
+                for (let k = 0; k < num_cube; k++) {
+                    this.drawCube({
+                        translate: [j * -200, k * -200, i * -200],
+                        rotate: [{rotateDeg: Math.sin(performance.now() * 0.001), rotateVec: [1,0,1]}]
+                    });
+                    this.drawCube({
+                        translate: [j * 200, k * -200, i * -200],
+                        rotate: [{rotateDeg: Math.cos(performance.now() * 0.001), rotateVec: [1,0,1]}]
+                    });
                 }
-                ]
-            });
-            this.drawCube({
-                translate: [0, this.positions[i] * 50, 0],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
-                }
-                ]
-            });
-            this.drawCube({
-                translate: [this.positions[i] * 50, 0, 0],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
-                }
-                ]
-            });
-            this.drawCube({
-                translate: [this.positions[i] * 50, this.positions[i] * 50, 0],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
-                }
-                ]
-            });
-            this.drawCube({
-                translate: [0, this.positions[i] * 50, this.positions[i] * 50],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
-                }
-                ]
-            });
-            this.drawCube({
-                translate: [this.positions[i] * 50, 0, this.positions[i] * 50],
-                rotate: [{
-                    rotateDeg: Math.sin(performance.now() * .001),
-                    rotateVec: [this.positions[i], this.positions[i], this.positions[i]]
-                }
-                ]
-            });
+
+            }
         }
 
         this.dataUpdate();
@@ -234,8 +197,8 @@ export default class GLcanvas {
         }: DrawParams
     ) {
         // const eye = [600, Math.sin(performance.now() * .001) * 500, 600];
-        const eye = [this.angle1 * 200, this.angle2 * 200, 600];
-        const target = [0, 0, 0];
+        const eye = [this.angle1 * 200, this.angle2 * -200, 600];
+        const target = [0, -500, 0];
         const up = [0, 1, 0];
 
         const tCamera = mat4.create();

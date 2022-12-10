@@ -55,8 +55,8 @@
     </canvas>
 
     <div>
-        <label for="slider1">Angle1</label><input id="slider1" max="2" min="-2" step="0.1" type="range" value="-2"/>
-        <label for="slider2">Angle2</label><input id="slider2" max="2" min="-2" step="0.1" type="range" value="-2"/>
+        <label for="slider1">Angle1</label><input id="slider1" max="2" min="-2" step="0.1" type="range" value="2"/>
+        <label for="slider2">Angle2</label><input id="slider2" max="2" min="-2" step="0.1" type="range" value="2"/>
     </div>
 
 </div>
@@ -119,7 +119,7 @@ const float ambientC  = 0.15;
 const float diffuseC  = 0.4;
 const float specularC = 1.0;
 const float specularE = 20.0;
-const vec3  lightCol  = vec3(1,1,1);
+vec3  lightCol  = vec3(sin(time),cos(time),sin(-time));
 const vec3  objectCol = vec3(.8,0.6,0.0); // yellow-ish orange
 
 vec2 blinnPhongDir(vec3 lightDir, vec3 n, float lightInt, float Ka,
