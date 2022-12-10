@@ -1,7 +1,8 @@
-import {triangleIndices, vertexNormals, vertexPos} from "./data";
+import {triangleIndices, vertexNormals, vertexPos, vertexTextureCoords} from "./data";
 import {mat3, mat4} from "./esm/index";
 import {DrawParams} from "./DrawParams";
 
+// noinspection DuplicatedCode
 export default class GLcanvas {
     private trianglePosBuffer_itemSize = 3;
     private trianglePosBuffer_numItems = 24;
@@ -9,6 +10,8 @@ export default class GLcanvas {
     private colorBuffer_numItems = 24;
     private normalBuffer_itemSize = 3;
     private normalBuffer_numItems = 24;
+    private textureBuffer_itemSize = 2;
+    private textureBuffer_numItems = 24;
     private MVPmatrix: WebGLUniformLocation;
     private trianglePosBuffer: WebGLBuffer;
     private normalBuffer: WebGLBuffer;
@@ -26,6 +29,13 @@ export default class GLcanvas {
     private angle1: number;
     private angle2: number;
     private positions: number[];
+    private tex_attr;
+    private texSampler1;
+    private texSampler2;
+    private textureBuffer: WebGLBuffer;
+    private texture1: WebGLTexture;
+    private texture2: WebGLTexture;
+
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -60,12 +70,18 @@ export default class GLcanvas {
         this.gl.enableVertexAttribArray(this.color_attr);
         this.normal_attr = this.gl.getAttribLocation(this.shader_prog, "vNormal")
         this.gl.enableVertexAttribArray(this.normal_attr);
+        this.tex_attr = this.gl.getAttribLocation(this.shader_prog, "vTexCoord");
+        this.gl.enableVertexAttribArray(this.tex_attr);
 
         // setup uniforms
         this.MVPmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVP");
         this.MVmatrix = this.gl.getUniformLocation(this.shader_prog, "uMV");
         this.MVNormalmatrix = this.gl.getUniformLocation(this.shader_prog, "uMVn");
         this.time = this.gl.getUniformLocation(this.shader_prog, "time");
+        this.texSampler1 = this.gl.getUniformLocation(this.shader_prog, "texSampler1");
+        this.gl.uniform1i(this.texSampler1, 0);
+        this.texSampler2 = this.gl.getUniformLocation(this.shader_prog, "texSampler2");
+        this.gl.uniform1i(this.texSampler2, 1);
 
         // buffering
         console.info("buffering...")
@@ -93,9 +109,35 @@ export default class GLcanvas {
         this.normalBuffer_itemSize = 3;
         this.normalBuffer_numItems = 24;
 
+        this.textureBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertexTextureCoords, this.gl.STATIC_DRAW);
+
         this.indexBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, triangleIndices, this.gl.STATIC_DRAW);
+
+        // Set up texture
+        this.texture1 = this.gl.createTexture();
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture1);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+        const image1 = new Image();
+
+        this.texture2 = this.gl.createTexture();
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture2);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+        const image2 = new Image();
+
+        image1.onload = () => {this.loadTexture(image1, this.texture1); }
+        image1.crossOrigin = "anonymous";
+        image1.src = "https://farm6.staticflickr.com/5564/30725680942_e3bfe50e5e_b.jpg";
+
+        image2.onload = () => {this.loadTexture(image2, this.texture2); }
+        image2.crossOrigin = "anonymous";
+        image2.src = "https://farm6.staticflickr.com/5564/30725680942_e3bfe50e5e_b.jpg";
+
 
         console.info("init done")
         this.positions = [];
@@ -109,8 +151,8 @@ export default class GLcanvas {
 
         // Clear screen, prepare for rendering
         this.gl.clearColor(Math.sin(performance.now() * .0013),
-                            Math.cos(performance.now() * .0014),
-                            Math.tan(performance.now() * .0016),
+            Math.cos(performance.now() * .0014),
+            Math.tan(performance.now() * .0016),
             .5);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -175,6 +217,14 @@ export default class GLcanvas {
         return Math.random() * (max - min) + min;
     }
 
+    private loadTexture(image: HTMLImageElement, texture: WebGLTexture) {
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
+
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+    }
+
     private drawCube(
         {
             scale = [50, 50, 50],
@@ -223,6 +273,14 @@ export default class GLcanvas {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
         this.gl.vertexAttribPointer(this.normal_attr, this.normalBuffer_itemSize,
             this.gl.FLOAT, false, 0, 0);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureBuffer);
+        this.gl.vertexAttribPointer(this.tex_attr, this.textureBuffer_itemSize, this.gl.FLOAT, false, 0, 0);
+
+        // Bind texture
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture1);
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture2);
 
         // Do the drawing
         this.gl.drawElements(this.gl.TRIANGLES, triangleIndices.length, this.gl.UNSIGNED_BYTE, 0);

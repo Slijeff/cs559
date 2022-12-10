@@ -64,9 +64,11 @@
 attribute vec3 vPosition;
 attribute vec3 vColor;
 attribute vec3 vNormal;
+attribute vec2 vTexCoord;
 varying vec3 fPosition;
 varying vec3 fColor;
 varying vec3 fNormal;
+varying vec2 fTexCoord;
 uniform mat4 uMVP;
 uniform mat4 uMV;
 uniform float time;
@@ -97,6 +99,7 @@ void main(void) {
     fPosition = (uMV * vec4(vPosition, 1.0)).xyz;
     fColor = vColor;
     fNormal = vNormal;
+    fTexCoord = vTexCoord;
 }
 </script>
 <script id="fragShader" type="shader">
@@ -104,8 +107,11 @@ precision highp float;
 varying vec3 fPosition;
 varying vec3 fColor;
 varying vec3 fNormal;
+varying vec2 fTexCoord;
 uniform mat3 uMVn;
 uniform float time;
+uniform sampler2D texSampler1;
+uniform sampler2D texSampler2;
 
 vec3  lightV    = vec3(sin(time),1.0,sin(time));
 const float lightI    = 1.0;               // only for diffuse component
@@ -127,10 +133,11 @@ float Kd, float Ks, float shininess) {
 }
 
 void main(void) {
+    vec3 texColor = texture2D(texSampler1,fTexCoord).xyz;
     vec3 n = normalize(uMVn * fNormal);
     vec3 v = normalize(-fPosition);
     vec3 ColorS  = blinnPhongDir(lightV,n,0.0   ,0.0,     0.0,     specularC,specularE).y*lightCol;
-    vec3 ColorAD = blinnPhongDir(lightV,n,lightI,ambientC,diffuseC,0.0,      1.0      ).x*fColor;
+    vec3 ColorAD = blinnPhongDir(lightV,n,lightI,ambientC,diffuseC,0.0,      1.0      ).x*texColor;
 
     gl_FragColor = vec4(ColorAD+ColorS,1.0);
 }

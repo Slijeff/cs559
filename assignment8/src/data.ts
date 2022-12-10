@@ -36,3 +36,11 @@ export const triangleIndices = new Uint8Array(
         16, 17, 18, 16, 18, 19,    // bottom
         20, 21, 22, 20, 22, 23]   // back
 )
+
+export const vertexTextureCoords = new Float32Array(
+    [  0, 0,   1, 0,   1, 1,   0, 1,
+            1, 0,   1, 1,   0, 1,   0, 0,
+            0, 1,   0, 0,   1, 0,   1, 1,
+            0, 0,   1, 0,   1, 1,   0, 1,
+            1, 1,   0, 1,   0, 0,   1, 0,
+            1, 1,   0, 1,   0, 0,   1, 0 ]);
