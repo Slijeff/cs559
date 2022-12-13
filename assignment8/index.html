@@ -99,7 +99,7 @@ void main(void) {
     fPosition = (uMV * vec4(vPosition, 1.0)).xyz;
     fColor = vColor;
     fNormal = vNormal;
-    fTexCoord = vTexCoord;
+    fTexCoord = vec2(vTexCoord.x * sin(time), vTexCoord.y * cos(time));
 }
 </script>
 <script id="fragShader" type="shader">

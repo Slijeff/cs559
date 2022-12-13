@@ -159,18 +159,14 @@ export default class GLcanvas {
         for (let i = 0; i < num_cube; i++) {
             for (let j = 0; j < num_cube; j++ ) {
                 for (let k = 0; k < num_cube; k++) {
-                    this.drawCube({
-                        translate: [j * -200, k * -200, i * -200],
-                        rotate: [{rotateDeg: Math.sin(performance.now() * 0.001), rotateVec: [1,0,1]}]
-                    });
-                    this.drawCube({
-                        translate: [j * 200, k * -200, i * -200],
-                        rotate: [{rotateDeg: Math.cos(performance.now() * 0.001), rotateVec: [1,0,1]}]
-                    });
+                    this.drawShape(i * 200, j * 200, k * 200)
                 }
 
             }
         }
+
+        // this.drawShape(0,0,0);
+
 
         this.dataUpdate();
         requestAnimationFrame(this.render);
@@ -188,6 +184,12 @@ export default class GLcanvas {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
     }
 
+    private drawShape(transx: number, transy: number, transz: number) {
+        this.drawCube({translate: [transx, transy, transz], scale: [200, 200, 10]})
+        this.drawCube({translate: [transx, transy, transz], scale: [200, 200, 10], rotate: [{rotateVec: [1,0,0], rotateDeg: Math.PI / 2}]})
+        this.drawCube({translate: [transx, transy, transz], scale: [200, 200, 10], rotate: [{rotateVec: [0,1,0], rotateDeg: Math.PI / 2}]})
+    }
+
     private drawCube(
         {
             scale = [50, 50, 50],
@@ -197,8 +199,8 @@ export default class GLcanvas {
         }: DrawParams
     ) {
         // const eye = [600, Math.sin(performance.now() * .001) * 500, 600];
-        const eye = [this.angle1 * 200, this.angle2 * -200, 600];
-        const target = [0, -500, 0];
+        const eye = [this.angle1 * -2000, this.angle2 * 600, -2000];
+        const target = [1000, 700, 0];
         const up = [0, 1, 0];
 
         const tCamera = mat4.create();
@@ -206,10 +208,10 @@ export default class GLcanvas {
 
         const tModel = mat4.create();
         mat4.fromTranslation(tModel, translate);
-        mat4.scale(tModel, tModel, scale);
         rotate.forEach((rot) => {
             mat4.rotate(tModel, tModel, rot.rotateDeg, rot.rotateVec);
         })
+        mat4.scale(tModel, tModel, scale);
 
         const tProjection = mat4.create();
         mat4.perspective(tProjection, Math.PI / 4, this.canvas.width / this.canvas.height, 10, undefined);
